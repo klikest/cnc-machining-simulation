@@ -123,12 +123,45 @@ char** Parse_vertices()
 
 	const char* SEPARATORS = " ";
 
+	int count_vert = 0;
+	int count_ind = 0;
+	int count_normals = 0;
+
+	//float vertices[5000];
+	//float normals[5000];
+	//float indices[5000];
+
+	for (int i = 0; i < count; i++)
+	{
+		if (lines[i][0] == '#')
+		{
+		};
+
+		if (lines[i][0] == 'v' && lines[i][1] == ' ')
+		{
+			//&vertices[count_vert] = lines[i];
+			count_vert += 1;
+		};
+
+		if (lines[i][0] == 'v' && lines[i][1] == 'n')
+		{
+			count_normals += 1;
+		};
+
+		if (lines[i][0] == 'f' && lines[i][1] == ' ')
+		{
+			count_ind += 1;
+		};
+
+	};
+
+	cout << "vertices = " << count_vert << endl;
+	cout << "normals = " << count_normals << endl;
+	cout << "indices = " << count_ind << endl;
 
 
-	while (ptr) {                //while (ptr != NULL)
-		cout << ptr << '\n';
-		ptr = strtok(0, SEPARATORS);   //Подбираем слово
-	}
+
+
 
 
 	/*for (int i = 0; i < count; i++)

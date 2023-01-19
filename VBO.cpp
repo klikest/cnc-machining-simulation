@@ -1,4 +1,5 @@
 #include"VBO.h"
+#include <iostream>
 
 // Constructor that generates a Vertex Buffer Object and links it to vertices
 VBO::VBO(GLfloat* vertices, GLsizeiptr size)
@@ -24,4 +25,15 @@ void VBO::Unbind()
 void VBO::Delete()
 {
 	glDeleteBuffers(1, &ID);
+}
+
+void VBO::UpdateData(float vert[])
+{
+	for (int i = 0; i < 100; i++)
+	{
+		std::cout << vert[i] << '\n';
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
 }

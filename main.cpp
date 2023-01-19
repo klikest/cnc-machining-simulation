@@ -22,7 +22,7 @@ const unsigned int height = 800;
 
 
 // Vertices coordinates
-GLfloat vertices[] =
+float vertices[] =
 { // COORDINATES / NORMALS //
 -0.5f, 0.0f, 0.5f,     0.0f, -1.0f, 0.0f, // Bottom side
 -0.5f, 0.0f, -0.5f,    0.0f, -1.0f, 0.0f, // Bottom side
@@ -149,7 +149,7 @@ int main()
 	glViewport(0, 0, width, height);
 
 
-	/*
+	
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 	// Generates Vertex Array Object and binds it
@@ -166,9 +166,9 @@ int main()
 	// Unbind all to prevent accidentally modifying them
 	VAO1.Unbind();
 	VBO1.Unbind();
-	EBO1.Unbind();*/
+	EBO1.Unbind();
 
-	Shader shaderProgram("default.vert", "default.frag");
+	/*Shader shaderProgram("default.vert", "default.frag");
 
 	GLuint VAO_1, VBO_1, EBO_1;
 
@@ -202,7 +202,7 @@ int main()
 	// Bind the EBO to 0 so that we don't accidentally modify it
 	// MAKE SURE TO UNBIND IT AFTER UNBINDING THE VAO, as the EBO is linked in the VAO
 	// This does not apply to the VBO because the VBO is already linked to the VAO during glVertexAttribPointer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
 
 
 
@@ -252,6 +252,8 @@ int main()
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 
 
@@ -291,22 +293,22 @@ int main()
 		//brickTex.Bind();
 		// Bind the VAO so OpenGL knows to use it
 
-		
-		
+	
 		if (frame % 2 == 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO_1);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		}
 		else
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO_1);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
 		}
-
 		
+
+
 		//glUseProgram(shaderProgram);
-		glBindVertexArray(VAO_1);
+		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
@@ -333,9 +335,9 @@ int main()
 
 
 	// Delete all the objects we've created
-	glDeleteVertexArrays(1, &VAO_1);
-	glDeleteBuffers(1, &VBO_1);
-	glDeleteBuffers(1, &EBO_1);
+	VAO1.Delete();
+	VBO1.Delete();
+	EBO1.Delete();
 	shaderProgram.Delete();
 	lightVAO.Delete();
 	lightVBO.Delete();

@@ -168,52 +168,7 @@ int main()
 	VBO1.Unbind();
 	EBO1.Unbind();
 
-	/*Shader shaderProgram("default.vert", "default.frag");
-
-	GLuint VAO_1, VBO_1, EBO_1;
-
-	// Generate the VAO, VBO, and EBO with only 1 object each
-	glGenVertexArrays(1, &VAO_1);
-	glGenBuffers(1, &VBO_1);
-	glGenBuffers(1, &EBO_1);
-
-	// Make the VAO the current Vertex Array Object by binding it
-	glBindVertexArray(VAO_1);
-
-	// Bind the VBO specifying it's a GL_ARRAY_BUFFER
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_1);
-	// Introduce the vertices into the VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// Bind the EBO specifying it's a GL_ELEMENT_ARRAY_BUFFER
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_1);
-	// Introduce the indices into the EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Configure the Vertex Attribute so that OpenGL knows how to read the VBO
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	// Enable the Vertex Attribute so that OpenGL knows to use it
-	glEnableVertexAttribArray(0);
-
-	// Bind both the VBO and VAO to 0 so that we don't accidentally modify the VAO and VBO we created
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	// Bind the EBO to 0 so that we don't accidentally modify it
-	// MAKE SURE TO UNBIND IT AFTER UNBINDING THE VAO, as the EBO is linked in the VAO
-	// This does not apply to the VBO because the VBO is already linked to the VAO during glVertexAttribPointer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
-
-
-
-
-
-
-
-
-
-
-
+	
 
 
 	// Shader for light cube
@@ -262,15 +217,40 @@ int main()
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CCW);
+
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 
 	int frame = 0;
 
+	double prevTime = 0.0f;
+	double crntTime = 0.0f;
+	double timeDiff = 0.0f;
+	unsigned int counter = 0;
+
+
+	glfwSwapInterval(1);
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		counter++;
+
+		if (timeDiff >= 1.0 / 30.0)
+		{
+			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			std::string title = "cnc mashining simulator - " + FPS + "FPS";
+			glfwSetWindowTitle(window, title.c_str());
+			prevTime = crntTime;
+			counter = 0;
+		}
 
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
@@ -289,9 +269,7 @@ int main()
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		// Export the camMatrix to the Vertex Shader of the pyramid
 		camera.Matrix(shaderProgram, "camMatrix");
-		// Binds texture so that is appears in rendering
-		//brickTex.Bind();
-		// Bind the VAO so OpenGL knows to use it
+
 
 	
 		if (frame % 2 == 0)
@@ -307,7 +285,6 @@ int main()
 		
 
 
-		//glUseProgram(shaderProgram);
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
@@ -329,7 +306,7 @@ int main()
 		// Take care of all GLFW events
 		glfwPollEvents();
 
-		frame += 1;
+		//frame += 1;
 	}
 
 

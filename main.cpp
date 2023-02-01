@@ -118,7 +118,7 @@ int main()
 {
 
 
-	char** lines = Parse_vertices();
+	Parse_vertices();
 	// Initialize GLFW
 	glfwInit();
 

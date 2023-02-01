@@ -1,4 +1,4 @@
 #pragma once
 
 
-char** Parse_vertices();
+int Parse_vertices();

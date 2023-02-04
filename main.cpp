@@ -22,7 +22,7 @@ const unsigned int height = 800;
 
 
 // Vertices coordinates
-float vertices[] =
+float vertices1[] =
 { // COORDINATES / NORMALS //
 -0.5f, 0.0f, 0.5f,     0.0f, -1.0f, 0.0f, // Bottom side
 -0.5f, 0.0f, -0.5f,    0.0f, -1.0f, 0.0f, // Bottom side
@@ -75,7 +75,7 @@ GLfloat vertices2[] =
 
 
 // Indices for vertices order
-GLuint indices[] =
+int indices1[] =
 {
 0, 1, 2, // Bottom side
 0, 2, 3, // Bottom side
@@ -85,7 +85,7 @@ GLuint indices[] =
 13, 15, 14 // Facing side
 };
 
-GLfloat lightVertices[] =
+float lightVertices[] =
 { // COORDINATES //
 -0.1f, -0.1f, 0.1f,
 -0.1f, -0.1f, -0.1f,
@@ -97,7 +97,7 @@ GLfloat lightVertices[] =
 0.1f, 0.1f, 0.1f
 };
 
-GLuint lightIndices[] =
+int lightIndices[] =
 {
 0, 1, 2,
 0, 2, 3,
@@ -114,11 +114,51 @@ GLuint lightIndices[] =
 };
 
 
+
+
+
+
+
+
 int main()
 {
 
+	
+	std::vector<float> vert = Parse_vertices();
+	std::vector<int> ind = Parse_indices();
 
-	Parse_vertices();
+	float vertices0[3000];
+	int indices0[3000];
+
+
+	for (int i = 0; i < vert.size(); ++i)
+	{
+		vertices0[i] = vert[i];
+	}
+
+	for (int i = 0; i < ind.size(); ++i)
+	{
+		indices0[i] = ind[i];
+	}
+
+	int num = 1;
+	std::cout << "Vertices" << std::endl;
+	for (int i = 0; i < vert.size(); i += 3)
+	{
+		std::cout << num << ')' << '\t' << vert[i] << '\t' << vert[i + 1] << '\t' << vert[i + 2] << '\t' << std::endl;
+		++num;
+	}
+
+	num = 1;
+	std::cout << "Indices" << std::endl;
+	for (int i = 0; i < ind.size(); i += 3)
+	{
+		std::cout << num << ')' << '\t' << ind[i] << '\t' << ind[i + 1] << '\t' << ind[i + 2] << '\t' << std::endl;
+		++num;
+	}
+
+
+	//Parse_vertices();
 	// Initialize GLFW
 	glfwInit();
 
@@ -156,9 +196,9 @@ int main()
 	VAO VAO1;
 	VAO1.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices2, sizeof(vertices2));
+	VBO VBO1(vertices0, sizeof(vertices0));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	EBO EBO1(indices0, sizeof(indices0));
 	// Links VBO attributes such as coordinates and colors to VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -207,8 +247,8 @@ int main()
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	//glEnableVertexAttribArray(0);
+	//glEnableVertexAttribArray(1);
 
 
 
@@ -271,23 +311,9 @@ int main()
 		camera.Matrix(shaderProgram, "camMatrix");
 
 
-	
-		if (frame % 2 == 0)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		}
-		else
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-		}
-		
-
-
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices0) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 
@@ -306,7 +332,6 @@ int main()
 		// Take care of all GLFW events
 		glfwPollEvents();
 
-		//frame += 1;
 	}
 
 

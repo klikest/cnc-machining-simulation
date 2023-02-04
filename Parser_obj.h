@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
 
 
-int Parse_vertices();
+std::vector<float> Parse_vertices();
+std::vector<int> Parse_indices();

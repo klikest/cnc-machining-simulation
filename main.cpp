@@ -143,9 +143,9 @@ int main()
 
 	int num = 1;
 	std::cout << "Vertices" << std::endl;
-	for (int i = 0; i < vert.size(); i += 3)
+	for (int i = 0; i < vert.size(); i += 6)
 	{
-		std::cout << num << ')' << '\t' << vert[i] << '\t' << vert[i + 1] << '\t' << vert[i + 2] << '\t' << std::endl;
+		std::cout << num << ')' << '\t' << vertices0[i] << '\t' << vertices0[i + 1] << '\t' << vertices0[i + 2] << '\t' << '\t' << vertices0[i+3] << '\t' << vertices0[i + 4] << '\t' << vertices0[i +5] << std::endl;
 		++num;
 	}
 
@@ -153,7 +153,7 @@ int main()
 	std::cout << "Indices" << std::endl;
 	for (int i = 0; i < ind.size(); i += 3)
 	{
-		std::cout << num << ')' << '\t' << ind[i] << '\t' << ind[i + 1] << '\t' << ind[i + 2] << '\t' << std::endl;
+		std::cout << num << ')' << '\t' << indices0[i] << '\t' << indices0[i + 1] << '\t' << indices0[i + 2] << '\t' << std::endl;
 		++num;
 	}
 

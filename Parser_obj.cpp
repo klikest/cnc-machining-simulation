@@ -8,7 +8,7 @@
 
 using namespace std;
 
-
+const char* name = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.txt";
 
 
 std::vector<std::string> split(const std::string& string,
@@ -42,9 +42,6 @@ vector<float> Parse_vertices()
     vector<float> normals;
 
     vector<float> vert ;
-
-    const char* name = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\cube.txt";
-
 
     //объ€вл€ем переменную котора€ будет ссылкой на файл 
     std::fstream FileObj;
@@ -92,9 +89,9 @@ vector<float> Parse_vertices()
         for (int i = 0; i < vertices.size(); i += 3)
         {
             
-            vert.push_back(vertices[i]);
-            vert.push_back(vertices[i+1]);
-            vert.push_back(vertices[i+2]);
+            vert.push_back(vertices[i]*10);
+            vert.push_back(vertices[i+1]*10);
+            vert.push_back(vertices[i+2]*10);
             vert.push_back(normals[i]);
             vert.push_back(normals[i+1]);
             vert.push_back(normals[i+2]);
@@ -117,8 +114,6 @@ vector<int> Parse_indices()
 
     vector<int> indices;
 
-    const char* name = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\cube.txt";
-
 
     //объ€вл€ем переменную котора€ будет ссылкой на файл 
     std::fstream FileObj;
@@ -130,6 +125,7 @@ vector<int> Parse_indices()
     //провер€ем открылс€ ли файл 
     if (FileObj.is_open())
     {
+        std::cout << "File opened" << endl;
         //обь€вл€ем переменную дл€ чтени€ строк текста из файла
         std::string ReadLine;
         //„итаем файл пока он не закончилс€
@@ -144,9 +140,9 @@ vector<int> Parse_indices()
             if (V1 == 'f' && V2 == ' ')
             {
                 vector<string> mass = split(ReadLine.c_str(), " ");
-                indices.push_back(stoi(split(mass[1], "//")[0]));
-                indices.push_back(stoi(split(mass[2], "//")[0]));
-                indices.push_back(stoi(split(mass[3], "//")[0]));
+                indices.push_back(stoi(split(mass[1], "//")[0])-1 );
+                indices.push_back(stoi(split(mass[2], "//")[0])-1 );
+                indices.push_back(stoi(split(mass[3], "//")[0])-1 );
             }
 
         }

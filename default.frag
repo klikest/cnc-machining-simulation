@@ -21,7 +21,7 @@ uniform vec3 camPos;
 void main()
 {
 	// ambient lighting
-	float ambient = 0.20f;
+	float ambient = 0.40f;
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
@@ -36,5 +36,6 @@ void main()
 	float specular = specAmount * specularLight;
 
 	// outputs final color
-	FragColor =  vec4(0.1, 0.9, 0.1, 1) * lightColor * (diffuse + ambient + specular);
+	FragColor =  vec4(0.8, 0.8, 0.8, 1) * lightColor * (ambient + diffuse);
+	//FragColor =  vec4(0.1, 0.9, 0.1, 1) * lightColor * (diffuse + ambient + specular);
 }

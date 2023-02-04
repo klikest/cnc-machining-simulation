@@ -127,8 +127,8 @@ int main()
 	std::vector<float> vert = Parse_vertices();
 	std::vector<int> ind = Parse_indices();
 
-	float vertices0[3000];
-	int indices0[3000];
+	float vertices0[10000];
+	int indices0[10000];
 
 
 	for (int i = 0; i < vert.size(); ++i)
@@ -141,21 +141,6 @@ int main()
 		indices0[i] = ind[i];
 	}
 
-	int num = 1;
-	std::cout << "Vertices" << std::endl;
-	for (int i = 0; i < vert.size(); i += 6)
-	{
-		std::cout << num << ')' << '\t' << vertices0[i] << '\t' << vertices0[i + 1] << '\t' << vertices0[i + 2] << '\t' << '\t' << vertices0[i+3] << '\t' << vertices0[i + 4] << '\t' << vertices0[i +5] << std::endl;
-		++num;
-	}
-
-	num = 1;
-	std::cout << "Indices" << std::endl;
-	for (int i = 0; i < ind.size(); i += 3)
-	{
-		std::cout << num << ')' << '\t' << indices0[i] << '\t' << indices0[i + 1] << '\t' << indices0[i + 2] << '\t' << std::endl;
-		++num;
-	}
 
 
 	//Parse_vertices();
@@ -257,6 +242,8 @@ int main()
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
+	//GL_SHADER_TYPE()
+
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 	//glFrontFace(GL_CCW);
@@ -296,6 +283,7 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 
 		// Handles camera inputs
 		camera.Inputs(window);

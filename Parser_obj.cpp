@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const char* name = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.txt";
+const char* name = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\pir.txt";
 
 
 std::vector<std::string> split(const std::string& string,
@@ -89,15 +89,17 @@ vector<float> Parse_vertices()
         for (int i = 0; i < vertices.size(); i += 3)
         {
             
-            vert.push_back(vertices[i]*10);
-            vert.push_back(vertices[i+1]*10);
-            vert.push_back(vertices[i+2]*10);
+            vert.push_back(vertices[i]);
+            vert.push_back(vertices[i+1]);
+            vert.push_back(vertices[i+2]);
             vert.push_back(normals[i]);
             vert.push_back(normals[i+1]);
             vert.push_back(normals[i+2]);
             
 
         }
+
+        cout << "File readed" << endl;
 
 
 
@@ -125,7 +127,7 @@ vector<int> Parse_indices()
     //проверяем открылся ли файл 
     if (FileObj.is_open())
     {
-        std::cout << "File opened" << endl;
+        
         //обьявляем переменную для чтения строк текста из файла
         std::string ReadLine;
         //Читаем файл пока он не закончился
@@ -148,7 +150,7 @@ vector<int> Parse_indices()
         }
 
     }
-
+    std::cout << "File opened" << endl;
 
     return indices;
 }

@@ -20,6 +20,7 @@ uniform vec3 camPos;
 
 void main()
 {
+	
 	// ambient lighting
 	float ambient = 0.40f;
 

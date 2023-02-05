@@ -117,15 +117,17 @@ int lightIndices[] =
 
 
 
-
+const	std::string tool = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\tool.obj";
+const	std::string blank = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.obj";
 
 
 int main()
 {
 
+
 	
-	std::vector<float> vert = Parse_vertices();
-	std::vector<int> ind = Parse_indices();
+	std::vector<float> vert = Parse_vertices_blank();
+	std::vector<int> ind = Parse_indices_blank();
 
 	float vertices0[10000];
 	int indices0[10000];
@@ -139,6 +141,26 @@ int main()
 	for (int i = 0; i < ind.size(); ++i)
 	{
 		indices0[i] = ind[i];
+	}
+
+
+
+
+	std::vector<float> vert_tool = Parse_vertices_tool();
+	std::vector<int> ind_tool = Parse_indices_tool();
+
+	float vertices_tool[10000];
+	int indices_tool[10000];
+
+
+	for (int i = 0; i < vert_tool.size(); ++i)
+	{
+		vertices_tool[i] = vert_tool[i];
+	}
+
+	for (int i = 0; i < ind_tool.size(); ++i)
+	{
+		indices_tool[i] = ind_tool[i];
 	}
 
 
@@ -202,11 +224,13 @@ int main()
 	VAO lightVAO;
 	lightVAO.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	VBO lightVBO(vertices_tool, sizeof(vertices_tool));
 	// Generates Element Buffer Object and links it to indices
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
+	EBO lightEBO(indices_tool, sizeof(indices_tool));
 	// Links VBO attributes such as coordinates and colors to VAO
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	//lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	lightVAO.LinkAttrib(lightVBO, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	// Unbind all to prevent accidentally modifying them
 	lightVAO.Unbind();
 	lightVBO.Unbind();
@@ -216,8 +240,8 @@ int main()
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(1.5f, 1.5f, 1.5f);
-	glm::mat4 lightModel = glm::mat4(1.0f);
-	lightModel = glm::translate(lightModel, lightPos);
+	//glm::mat4 lightModel = glm::mat4(1.0f);
+	//lightModel = glm::translate(lightModel, lightPos);
 
 	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
@@ -225,7 +249,7 @@ int main()
 
 
 	lightShader.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	//glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	shaderProgram.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
@@ -241,6 +265,7 @@ int main()
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
+
 
 	//GL_SHADER_TYPE()
 
@@ -262,9 +287,32 @@ int main()
 
 	glfwSwapInterval(1);
 
+
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+
+
+
+		
+		for (int i = 0; i < vert.size(); i += 6)
+		{
+			vert[i] += 0.001;
+			vert[i+1] += 0.001;
+			vert[i+2] += 0.001;
+			
+		}
+
+		for (int i = 0; i < vert.size(); ++i)
+		{
+			vertices0[i] = vert[i];
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_DYNAMIC_DRAW);
+
+
 
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -312,7 +360,7 @@ int main()
 		// Bind the VAO so OpenGL knows to use it
 		lightVAO.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices_tool) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 		// Swap the back buffer with the front buffer

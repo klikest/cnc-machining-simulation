@@ -20,103 +20,6 @@ const unsigned int width = 800;
 const unsigned int height = 800;
 
 
-
-// Vertices coordinates
-float vertices1[] =
-{ // COORDINATES / NORMALS //
--0.5f, 0.0f, 0.5f,     0.0f, -1.0f, 0.0f, // Bottom side
--0.5f, 0.0f, -0.5f,    0.0f, -1.0f, 0.0f, // Bottom side
-0.5f, 0.0f, -0.5f,     0.0f, -1.0f, 0.0f, // Bottom side
-0.5f, 0.0f, 0.5f,      0.0f, -1.0f, 0.0f, // Bottom side
-
--0.5f, 0.0f, 0.5f,    -0.8f, 0.5f, 0.0f, // Left Side
--0.5f, 0.0f, -0.5f,   -0.8f, 0.5f, 0.0f, // Left Side
-0.0f, 0.8f, 0.0f,     -0.8f, 0.5f, 0.0f, // Left Side
-
--0.5f, 0.0f, -0.5f,    0.0f, 0.5f, -0.8f, // Non-facing side
-0.5f, 0.0f, -0.5f,     0.0f, 0.5f, -0.8f, // Non-facing side
-0.0f, 0.8f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
-
-0.5f, 0.0f, -0.5f,     0.8f, 0.5f, 0.0f, // Right side
-0.5f, 0.0f, 0.5f,      0.8f, 0.5f, 0.0f, // Right side
-0.0f, 0.8f, 0.0f,      0.8f, 0.5f, 0.0f, // Right side
-
-0.5f, 0.0f, 0.5f,      0.0f, 0.5f, 0.8f, // Facing side
--0.5f, 0.0f, 0.5f,     0.0f, 0.5f, 0.8f, // Facing side
-0.0f, 0.8f, 0.0f,      0.0f, 0.5f, 0.8f // Facing side
-};
-
-
-
-
-GLfloat vertices2[] =
-{ // COORDINATES     /       NORMALS        //
--0.5f, 0.0f, 0.2f,       0.0f, -1.0f, 0.0f, // Bottom side
--0.5f, 0.0f, -0.5f,      0.0f, -1.0f, 0.0f, // Bottom side
- 0.5f, 0.0f, -0.5f,      0.0f, -1.0f, 0.0f, // Bottom side
- 0.5f, 0.0f, 0.2f,       0.0f, -1.0f, 0.0f, // Bottom side
-
--0.5f, 0.0f, 0.2f,      -0.8f, 0.5f, 0.0f, // Left Side
--0.5f, 0.0f, -0.5f,     -0.8f, 0.5f, 0.0f, // Left Side
- 0.0f, 0.5f, 0.0f,      -0.8f, 0.5f, 0.0f, // Left Side
-
--0.5f, 0.0f, -0.5f,      0.0f, 0.5f, -0.8f, // Non-facing side
- 0.5f, 0.0f, -0.5f,      0.0f, 0.5f, -0.8f, // Non-facing side
- 0.0f, 0.5f, 0.0f,       0.0f, 0.5f, -0.8f, // Non-facing side
-
- 0.5f, 0.0f, -0.5f,      0.8f, 0.5f, 0.0f, // Right side
- 0.5f, 0.0f, 0.2f,       0.8f, 0.5f, 0.0f, // Right side
- 0.0f, 0.5f, 0.0f,       0.8f, 0.5f, 0.0f, // Right side
-
- 0.5f, 0.0f, 0.2f,       0.0f, 0.5f, 0.8f, // Facing side
--0.5f, 0.0f, 0.2f,       0.0f, 0.5f, 0.8f, // Facing side
- 0.0f, 0.5f, 0.0f,       0.0f, 0.5f, 0.8f // Facing side
-};
-
-
-// Indices for vertices order
-int indices1[] =
-{
-0, 1, 2, // Bottom side
-0, 2, 3, // Bottom side
-4, 6, 5, // Left side
-7, 9, 8, // Non-facing side
-10, 12, 11, // Right side
-13, 15, 14 // Facing side
-};
-
-float lightVertices[] =
-{ // COORDINATES //
--0.1f, -0.1f, 0.1f,
--0.1f, -0.1f, -0.1f,
-0.1f, -0.1f, -0.1f,
-0.1f, -0.1f, 0.1f,
--0.1f, 0.1f, 0.1f,
--0.1f, 0.1f, -0.1f,
-0.1f, 0.1f, -0.1f,
-0.1f, 0.1f, 0.1f
-};
-
-int lightIndices[] =
-{
-0, 1, 2,
-0, 2, 3,
-0, 4, 7,
-0, 7, 3,
-3, 7, 6,
-3, 6, 2,
-2, 6, 5,
-2, 5, 1,
-1, 5, 4,
-1, 4, 0,
-4, 5, 6,
-4, 6, 7
-};
-
-
-
-
-
 const	std::string tool = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\tool.obj";
 const	std::string blank = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.obj";
 
@@ -124,42 +27,29 @@ const	std::string blank = "C:\\Users\\User\\source\\repos\\cnc-machining-simulat
 int main()
 {
 
-
-	
-	std::vector<float> vert = Parse_vertices_blank();
-
+	std::vector<float> vert_blank = Parse_vertices_blank();
 	float vertices_blank[10000];
 	int indices_blank[10000];
-
-
-	for (int i = 0; i < vert.size(); ++i)
+	for (int i = 0; i < vert_blank.size(); ++i)
 	{
-		vertices_blank[i] = vert[i];
+		vertices_blank[i] = vert_blank[i];
 	}
-
-	for (int i = 0; i < vert.size()/2; ++i)
+	for (int i = 0; i < vert_blank.size()/2; ++i)
 	{
 		indices_blank[i] = i;
 	}
 
 
-
-
 	std::vector<float> vert_tool = Parse_vertices_tool();
-	std::vector<int> ind_tool = Parse_indices_tool();
-
 	float vertices_tool[10000];
 	int indices_tool[10000];
-
-
 	for (int i = 0; i < vert_tool.size(); ++i)
 	{
 		vertices_tool[i] = vert_tool[i];
 	}
-
-	for (int i = 0; i < ind_tool.size(); ++i)
+	for (int i = 0; i < vert_tool.size() / 2; ++i)
 	{
-		indices_tool[i] = ind_tool[i];
+		indices_tool[i] = i;
 	}
 
 
@@ -227,8 +117,8 @@ int main()
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO_tool(indices_tool, sizeof(indices_tool));
 	// Links VBO attributes such as coordinates and colors to VAO
-	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO_blank.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO_blank.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	// Unbind all to prevent accidentally modifying them
 	VAO_tool.Unbind();
 	VBO_tool.Unbind();
@@ -237,7 +127,7 @@ int main()
 
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(1.5f, 1.5f, 1.5f);
+	glm::vec3 lightPos = glm::vec3(100.5f, 100.5f, 100.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 

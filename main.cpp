@@ -151,41 +151,41 @@ int main()
 
 	
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("default.vert", "default.frag");
+	Shader blank_shaderProgram("default.vert", "default.frag");
 	// Generates Vertex Array Object and binds it
-	VAO VAO1;
-	VAO1.Bind();
+	VAO VAO_blank;
+	VAO_blank.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices2, sizeof(vertices2));
+	VBO VBO_blank(vertices2, sizeof(vertices2));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	EBO EBO_blank(indices, sizeof(indices));
 	// Links VBO attributes such as coordinates and colors to VAO
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// Unbind all to prevent accidentally modifying them
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
+	VAO_blank.Unbind();
+	VBO_blank.Unbind();
+	EBO_blank.Unbind();
 
 	
 
 
 	// Shader for light cube
-	Shader lightShader("light.vert", "light.frag");
+	Shader tool_shaderProgram("light.vert", "light.frag");
 	// Generates Vertex Array Object and binds it
-	VAO lightVAO;
-	lightVAO.Bind();
+	VAO VAO_tool;
+	VAO_tool.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	VBO VBO_tool(lightVertices, sizeof(lightVertices));
 	// Generates Element Buffer Object and links it to indices
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
+	EBO EBO_tool(lightIndices, sizeof(lightIndices));
 	// Links VBO attributes such as coordinates and colors to VAO
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	VAO_tool.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
 	// Unbind all to prevent accidentally modifying them
-	lightVAO.Unbind();
-	lightVBO.Unbind();
-	lightEBO.Unbind();
+	VAO_tool.Unbind();
+	VBO_tool.Unbind();
+	EBO_tool.Unbind();
 
 
 
@@ -199,13 +199,13 @@ int main()
 	pyramidModel = glm::translate(pyramidModel, pyramidPos);
 
 
-	lightShader.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
-	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	shaderProgram.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	tool_shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(tool_shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(tool_shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	blank_shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(blank_shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform4f(glGetUniformLocation(blank_shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -264,39 +264,39 @@ int main()
 
 
 		// Tells OpenGL which Shader Program we want to use
-		shaderProgram.Activate();
+		blank_shaderProgram.Activate();
 		// Exports the camera Position to the Fragment Shader for specular lighting
-		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		// Export the camMatrix to the Vertex Shader of the pyramid
-		camera.Matrix(shaderProgram, "camMatrix");
+		camera.Matrix(blank_shaderProgram, "camMatrix");
 
 
 	
 		if (frame % 2 == 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		}
 		else
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
 		}
 		
 
 
-		VAO1.Bind();
+		VAO_blank.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 
 		// Tells OpenGL which Shader Program we want to use
-		lightShader.Activate();
+		tool_shaderProgram.Activate();
 		// Export the camMatrix to the Vertex Shader of the light cube
-		camera.Matrix(lightShader, "camMatrix");
+		camera.Matrix(tool_shaderProgram, "camMatrix");
 		// Bind the VAO so OpenGL knows to use it
-		lightVAO.Bind();
+		VAO_tool.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
@@ -306,20 +306,20 @@ int main()
 		// Take care of all GLFW events
 		glfwPollEvents();
 
-		//frame += 1;
+		frame += 1;
 	}
 
 
 
 	// Delete all the objects we've created
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
-	shaderProgram.Delete();
-	lightVAO.Delete();
-	lightVBO.Delete();
-	lightEBO.Delete();
-	lightShader.Delete();
+	VAO_blank.Delete();
+	VBO_blank.Delete();
+	EBO_blank.Delete();
+	blank_shaderProgram.Delete();
+	VAO_tool.Delete();
+	VBO_tool.Delete();
+	EBO_tool.Delete();
+	tool_shaderProgram.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

@@ -127,20 +127,19 @@ int main()
 
 	
 	std::vector<float> vert = Parse_vertices_blank();
-	std::vector<int> ind = Parse_indices_blank();
 
-	float vertices0[10000];
-	int indices0[10000];
+	float vertices_blank[10000];
+	int indices_blank[10000];
 
 
 	for (int i = 0; i < vert.size(); ++i)
 	{
-		vertices0[i] = vert[i];
+		vertices_blank[i] = vert[i];
 	}
 
-	for (int i = 0; i < ind.size(); ++i)
+	for (int i = 0; i < vert.size()/2; ++i)
 	{
-		indices0[i] = ind[i];
+		indices_blank[i] = i;
 	}
 
 
@@ -203,9 +202,9 @@ int main()
 	VAO VAO_blank;
 	VAO_blank.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices2, sizeof(vertices2));
+	VBO VBO_blank(vertices_blank, sizeof(vertices_blank));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
+	EBO EBO_blank(indices_blank, sizeof(indices_blank));
 	// Links VBO attributes such as coordinates and colors to VAO
 	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -224,11 +223,12 @@ int main()
 	VAO VAO_tool;
 	VAO_tool.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	VBO VBO_tool(vertices_tool, sizeof(vertices_tool));
 	// Generates Element Buffer Object and links it to indices
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
+	EBO EBO_tool(indices_tool, sizeof(indices_tool));
 	// Links VBO attributes such as coordinates and colors to VAO
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	// Unbind all to prevent accidentally modifying them
 	VAO_tool.Unbind();
 	VBO_tool.Unbind();
@@ -293,7 +293,7 @@ int main()
 
 
 
-		
+		/*
 		for (int i = 0; i < vert.size(); i += 6)
 		{
 			vert[i] += 0.001;
@@ -309,7 +309,7 @@ int main()
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_DYNAMIC_DRAW);
-
+		*/
 
 
 		crntTime = glfwGetTime();
@@ -334,7 +334,7 @@ int main()
 		// Handles camera inputs
 		camera.Inputs(window);
 		// Updates and exports the camera matrix to the Vertex Shader
-		camera.updateMatrix(45.0f, 0.1f, 100.0f);
+		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
 
 
 		// Tells OpenGL which Shader Program we want to use
@@ -345,23 +345,23 @@ int main()
 		camera.Matrix(blank_shaderProgram, "camMatrix");
 
 
-	
+	/*
 		if (frame % 2 == 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_blank), vertices_blank, GL_STATIC_DRAW);
 		}
 		else
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-		}
+		}*/
 		
 
 
-		VAO1.Bind();
+		VAO_blank.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices0) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices_blank) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 

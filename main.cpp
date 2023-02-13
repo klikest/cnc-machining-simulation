@@ -22,7 +22,7 @@ const unsigned int height = 800;
 
 
 // Vertices coordinates
-float vertices[] =
+float vertices1[] =
 { // COORDINATES / NORMALS //
 -0.5f, 0.0f, 0.5f,     0.0f, -1.0f, 0.0f, // Bottom side
 -0.5f, 0.0f, -0.5f,    0.0f, -1.0f, 0.0f, // Bottom side
@@ -75,7 +75,7 @@ GLfloat vertices2[] =
 
 
 // Indices for vertices order
-GLuint indices[] =
+int indices1[] =
 {
 0, 1, 2, // Bottom side
 0, 2, 3, // Bottom side
@@ -85,7 +85,7 @@ GLuint indices[] =
 13, 15, 14 // Facing side
 };
 
-GLfloat lightVertices[] =
+float lightVertices[] =
 { // COORDINATES //
 -0.1f, -0.1f, 0.1f,
 -0.1f, -0.1f, -0.1f,
@@ -97,7 +97,7 @@ GLfloat lightVertices[] =
 0.1f, 0.1f, 0.1f
 };
 
-GLuint lightIndices[] =
+int lightIndices[] =
 {
 0, 1, 2,
 0, 2, 3,
@@ -114,11 +114,58 @@ GLuint lightIndices[] =
 };
 
 
+
+
+
+const	std::string tool = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\tool.obj";
+const	std::string blank = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.obj";
+
+
 int main()
 {
 
 
-	char** lines = Parse_vertices();
+	
+	std::vector<float> vert = Parse_vertices_blank();
+	std::vector<int> ind = Parse_indices_blank();
+
+	float vertices0[10000];
+	int indices0[10000];
+
+
+	for (int i = 0; i < vert.size(); ++i)
+	{
+		vertices0[i] = vert[i];
+	}
+
+	for (int i = 0; i < ind.size(); ++i)
+	{
+		indices0[i] = ind[i];
+	}
+
+
+
+
+	std::vector<float> vert_tool = Parse_vertices_tool();
+	std::vector<int> ind_tool = Parse_indices_tool();
+
+	float vertices_tool[10000];
+	int indices_tool[10000];
+
+
+	for (int i = 0; i < vert_tool.size(); ++i)
+	{
+		vertices_tool[i] = vert_tool[i];
+	}
+
+	for (int i = 0; i < ind_tool.size(); ++i)
+	{
+		indices_tool[i] = ind_tool[i];
+	}
+
+
+
+	//Parse_vertices();
 	// Initialize GLFW
 	glfwInit();
 
@@ -156,9 +203,9 @@ int main()
 	VAO VAO_blank;
 	VAO_blank.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO_blank(vertices2, sizeof(vertices2));
+	VBO VBO1(vertices2, sizeof(vertices2));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO_blank(indices, sizeof(indices));
+	EBO EBO1(indices, sizeof(indices));
 	// Links VBO attributes such as coordinates and colors to VAO
 	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -177,11 +224,11 @@ int main()
 	VAO VAO_tool;
 	VAO_tool.Bind();
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO_tool(lightVertices, sizeof(lightVertices));
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO_tool(lightIndices, sizeof(lightIndices));
+	EBO lightEBO(lightIndices, sizeof(lightIndices));
 	// Links VBO attributes such as coordinates and colors to VAO
-	VAO_tool.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
 	// Unbind all to prevent accidentally modifying them
 	VAO_tool.Unbind();
 	VBO_tool.Unbind();
@@ -207,8 +254,8 @@ int main()
 	glUniform4f(glGetUniformLocation(blank_shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	//glEnableVertexAttribArray(0);
+	//glEnableVertexAttribArray(1);
 
 
 
@@ -216,6 +263,9 @@ int main()
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
+
+
+	//GL_SHADER_TYPE()
 
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
@@ -235,9 +285,32 @@ int main()
 
 	glfwSwapInterval(1);
 
+
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
+
+
+
+		
+		for (int i = 0; i < vert.size(); i += 6)
+		{
+			vert[i] += 0.001;
+			vert[i+1] += 0.001;
+			vert[i+2] += 0.001;
+			
+		}
+
+		for (int i = 0; i < vert.size(); ++i)
+		{
+			vertices0[i] = vert[i];
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_DYNAMIC_DRAW);
+
+
 
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -256,6 +329,7 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 
 		// Handles camera inputs
 		camera.Inputs(window);
@@ -274,20 +348,20 @@ int main()
 	
 		if (frame % 2 == 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 		}
 		else
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
 		}
 		
 
 
-		VAO_blank.Bind();
+		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices0) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 
@@ -298,7 +372,7 @@ int main()
 		// Bind the VAO so OpenGL knows to use it
 		VAO_tool.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices_tool) / sizeof(int), GL_UNSIGNED_INT, 0);
 
 
 		// Swap the back buffer with the front buffer
@@ -306,7 +380,7 @@ int main()
 		// Take care of all GLFW events
 		glfwPollEvents();
 
-		frame += 1;
+		//frame += 1;
 	}
 
 

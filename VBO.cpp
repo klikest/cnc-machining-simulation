@@ -29,11 +29,6 @@ void VBO::Delete()
 
 void VBO::UpdateData(float vert[])
 {
-	for (int i = 0; i < 100; i++)
-	{
-		std::cout << vert[i] << '\n';
-	}
-
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_DYNAMIC_DRAW);
 }

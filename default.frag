@@ -37,6 +37,5 @@ void main()
 	float specular = specAmount * specularLight;
 
 	// outputs final color
-	//FragColor =  vec4(0.8, 0.8, 0.8, 1) * lightColor * (ambient + diffuse);
-	FragColor =  vec4(0.8, 0.8, 0.8, 1) * lightColor * (diffuse + ambient + specular);
+	FragColor =  vec4(0.64, 0.64, 0.64, 1) * lightColor * (diffuse + ambient + specular);
 }

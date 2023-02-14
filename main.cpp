@@ -1,7 +1,13 @@
+#include"imgui.h"
+#include"imgui_impl_glfw.h"
+#include"imgui_impl_opengl3.h"
+
 #include<iostream>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include "mcut/mcut.h"
+
+
 
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
@@ -257,6 +263,21 @@ int main()
 
 
 
+
+
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+
+
+
+
+
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -297,6 +318,11 @@ int main()
 
 		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 		
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
@@ -325,11 +351,26 @@ int main()
 		camera.Matrix(tool_shaderProgram, "camMatrix");
 		VAO_tool.Bind();
 		glDrawElements(GL_TRIANGLES, sizeof(indices_tool) / sizeof(int), GL_UNSIGNED_INT, 0);
+		
+		ImGui::Begin("Header");
+		ImGui::Text("Text");
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 		//frame += 1;
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
+
 
 	VAO_blank.Delete();
 	VBO_blank.Delete();

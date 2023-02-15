@@ -251,7 +251,7 @@ int main()
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
-	int frame = 0;
+	float frame = 0;
 
 	double prevTime = 0.0f;
 	double crntTime = 0.0f;
@@ -352,8 +352,12 @@ int main()
 		VAO_tool.Bind();
 		glDrawElements(GL_TRIANGLES, sizeof(indices_tool) / sizeof(int), GL_UNSIGNED_INT, 0);
 		
+		std::string x_cord = "X = " + std::to_string(frame);
+
 		ImGui::Begin("Header");
-		ImGui::Text("Text");
+		ImGui::Text(x_cord.c_str());
+		ImGui::Text("Text 2");
+		ImGui::Text("Text 3");
 		ImGui::End();
 
 		ImGui::Render();
@@ -363,7 +367,7 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		//frame += 1;
+		frame += 0.001;
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();

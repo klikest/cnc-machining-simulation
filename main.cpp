@@ -21,6 +21,7 @@
 #include"EBO.h"
 #include"Camera.h"
 #include"Parser_obj.h"
+#include"Mesh.h"
 
 
 #if defined(_WIN32)
@@ -86,6 +87,12 @@ int main()
 	{
 		indices_tool[i] = i;
 	}
+
+
+	Mesh blank;
+
+	std::vector<float> vert_for_print = blank.Get_vertives_to_OpenGl(vert_blank);
+
 
 
 

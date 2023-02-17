@@ -8,8 +8,8 @@
 
 using namespace std;
 
-const char* name_blank = "H:\\Projects\\cnc machining simulation\\Models\\blank.stl";
-const char* name_tool = "H:\\Projects\\cnc machining simulation\\Models\\tool.stl";
+const char* name_blank = "Models\\blank.stl";
+const char* name_tool = "Models\\tool.stl";
 
 
 std::vector<std::string> split(const std::string& string,

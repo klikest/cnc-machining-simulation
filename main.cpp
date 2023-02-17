@@ -2,7 +2,7 @@
 #include"imgui_impl_glfw.h"
 #include"imgui_impl_opengl3.h"
 
-#include<iostream>
+#include <iostream>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include "mcut/mcut.h"
@@ -24,40 +24,8 @@
 #include"Mesh.h"
 
 
-#if defined(_WIN32)
-#define _CRT_SECURE_NO_WARNINGS 1
-
-#ifdef _WIN32
-#pragma warning(disable : 26812) // Unscoped enums from mcut.h
-#endif // _WIN32
-#endif
-
-#define my_assert(cond)                             \
-    if (!(cond)) {                                  \
-        fprintf(stderr, "MCUT error: %s\n", #cond); \
-        std::exit(1);                               \
-    }
-
-
-
-struct InputMesh {
-	// variables for reading .obj file data with libigl
-	std::vector<std::vector<double>> V;
-	std::vector<std::vector<int>> F;
-
-	// variables for mesh data in a format suited for MCUT
-	std::string fpath; // path to mesh file
-	std::vector<uint32_t> faceSizesArray; // vertices per face
-	std::vector<uint32_t> faceIndicesArray; // face indices
-	std::vector<double> vertexCoordsArray; // vertex coords
-};
-
 const unsigned int width = 800;
 const unsigned int height = 800;
-
-const	std::string tool = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\tool.obj";
-const	std::string blank = "C:\\Users\\User\\source\\repos\\cnc-machining-simulation\\Models\\blank.obj";
-
 
 int main()
 {
@@ -92,95 +60,6 @@ int main()
 	Mesh blank;
 
 	std::vector<float> vert_for_print = blank.Get_vertives_to_OpenGl(vert_blank);
-
-
-
-
-
-
-
-
-	/*
-
-
-	McContext context = MC_NULL_HANDLE;
-	McResult err = mcCreateContext(&context, MC_DEBUG);
-	my_assert(err == MC_NO_ERROR);
-
-
-	const std::map<std::string, McFlags> booleanOps = {
-	{ "A_NOT_B", MC_DISPATCH_FILTER_FRAGMENT_SEALING_INSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE },
-	{ "B_NOT_A", MC_DISPATCH_FILTER_FRAGMENT_SEALING_OUTSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_BELOW },
-	{ "UNION", MC_DISPATCH_FILTER_FRAGMENT_SEALING_OUTSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE },
-	{ "INTERSECTION", MC_DISPATCH_FILTER_FRAGMENT_SEALING_INSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_BELOW }
-	};
-
-
-	const auto boolOpFlags = MC_DISPATCH_FILTER_FRAGMENT_SEALING_INSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_BELOW;
-
-	err = mcDispatch(
-		context,
-		MC_DISPATCH_VERTEX_ARRAY_DOUBLE | // vertices are in array of doubles
-			MC_DISPATCH_ENFORCE_GENERAL_POSITION | // perturb if necessary
-			boolOpFlags, // filter flags which specify the type of output we want
-		// source mesh
-		reinterpret_cast<const void*>(srcMesh.vertexCoordsArray.data()),
-		reinterpret_cast<const uint32_t*>(srcMesh.faceIndicesArray.data()),
-		srcMesh.faceSizesArray.data(),
-		static_cast<uint32_t>(srcMesh.vertexCoordsArray.size() / 3),
-		static_cast<uint32_t>(srcMesh.faceSizesArray.size()),
-		// cut mesh
-		reinterpret_cast<const void*>(cutMesh.vertexCoordsArray.data()),
-		cutMesh.faceIndicesArray.data(),
-		cutMesh.faceSizesArray.data(),
-		static_cast<uint32_t>(cutMesh.vertexCoordsArray.size() / 3),
-		static_cast<uint32_t>(cutMesh.faceSizesArray.size()));
-
-
-	uint32_t numConnComps;
-	err = mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_FRAGMENT, 0, NULL, &numConnComps);
-	my_assert(err == MC_NO_ERROR);
-
-	printf("connected components: %d\n", (int)numConnComps);
-
-	if (numConnComps == 0) {
-		fprintf(stdout, "no connected components found\n");
-		exit(0);
-	}
-
-	std::vector<McConnectedComponent> connectedComponents(numConnComps, MC_NULL_HANDLE);
-	connectedComponents.resize(numConnComps);
-	err = mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_FRAGMENT, (uint32_t)connectedComponents.size(), connectedComponents.data(), NULL);
-
-
-
-	McConnectedComponent connComp = connectedComponents[0];
-
-	// query the vertices
-	// ----------------------
-
-	uint64_t numBytes = 0;
-	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_DOUBLE, 0, NULL, &numBytes);
-	my_assert(err == MC_NO_ERROR);
-	uint32_t ccVertexCount = (uint32_t)(numBytes / (sizeof(double) * 3));
-	std::vector<double> ccVertices((uint64_t)ccVertexCount * 3u, 0);
-	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_DOUBLE, numBytes, (void*)ccVertices.data(), NULL);
-	my_assert(err == MC_NO_ERROR);
-
-	// query the faces
-	// -------------------
-	numBytes = 0;
-
-
-	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, 0, NULL, &numBytes);
-	my_assert(err == MC_NO_ERROR);
-	std::vector<uint32_t> ccFaceIndices(numBytes / sizeof(uint32_t), 0);
-	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, numBytes, ccFaceIndices.data(), NULL);
-	my_assert(err == MC_NO_ERROR);
-
-	std::vector<uint32_t> faceSizes(ccFaceIndices.size() / 3, 3);
-	*/
-
 
 
 	// Initialize GLFW
@@ -268,22 +147,12 @@ int main()
 
 	glfwSwapInterval(1);
 
-
-
-
-
-
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
-
-
-
-
-
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -361,7 +230,7 @@ int main()
 		
 		std::string x_cord = "X = " + std::to_string(frame);
 
-		ImGui::Begin("Header");
+		ImGui::Begin("Tool info");
 		ImGui::Text(x_cord.c_str());
 		ImGui::Text("Text 2");
 		ImGui::Text("Text 3");

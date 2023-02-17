@@ -11,26 +11,39 @@ Mesh::Mesh()
 
 	std::vector<float> vertices_and_normals;
 	std::vector<float> vertices;
-	std::vector<int> indices;
+	std::vector<int> indices = {};
 }
 
 void add_Data_vertices(std::vector<float> vertices_and_normals_enter)
 {
-	Mesh::vertices_and_normals = vertices_and_normals_enter;
+	for (int i = 0; i < vertices_and_normals_enter.size(); ++i)
+	{
+		//Mesh::x += 1;
+	}
 }
+
+void create_Indices(std::vector<float> vertices)
+{
+	for (int i=0; i<vertices.size(); ++i)
+	{
+		
+	}
+}
+
+
 
 
 std::vector<float> get_Data_vertices()
 {
-	return Mesh::vertices_and_normals;
+	return std::vector<float> {0};
 }
 
 
-void Mesh::moving_x(float x_p)
+void Mesh::moving_x(float delta_x)
 {
 	for (int i = 0; i < 10; i++)
 	{
-
+		vertices_and_normals[i] += delta_x;
 	}
 }
 

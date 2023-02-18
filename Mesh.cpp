@@ -11,7 +11,7 @@ Mesh::Mesh()
 
 	std::vector<float> vertices_and_normals;
 	std::vector<float> vertices;
-	std::vector<int> indices = {};
+	std::vector<int> indices ;
 }
 
 void add_Data_vertices(std::vector<float> vertices_and_normals_enter)

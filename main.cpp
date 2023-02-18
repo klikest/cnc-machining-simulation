@@ -21,7 +21,75 @@
 #include"EBO.h"
 #include"Camera.h"
 #include"Parser_obj.h"
-#include"Mesh.h"
+//#include"Mesh.h"
+
+
+class Mesh {
+	float x;
+	float y;
+	float z;
+
+	std::vector<float> vertices_and_normals;
+	std::vector<float> vertices;
+	std::vector<int> indices;
+
+public:
+	Mesh(std::vector<float> vertices_and_normals_input)
+	{	
+		x = 0;
+		y = 0;
+		z = 0;
+
+		vertices_and_normals = vertices_and_normals_input;
+
+		for (int i = 0; i < vertices_and_normals_input.size(); i += 6)
+		{
+			vertices.push_back(vertices_and_normals_input[i]);
+			vertices.push_back(vertices_and_normals_input[i+1]);
+			vertices.push_back(vertices_and_normals_input[i+2]);
+		}
+		for (int i = 0; i < vertices_and_normals_input.size()/2; ++i)
+		{
+			indices.push_back(i);
+		}
+	}
+
+
+
+
+
+
+
+	
+	float* convert_to_float(std::vector<float> vert_n)
+	{
+		float vert[10000];
+
+		for (int i = 0; i < vert_n.size(); ++i)
+		{
+			vert[i] = vert_n[i];
+		}
+
+		return vert;
+	}
+
+	void move_x_vert(float dx, VBO& VBO)
+	{
+		x += dx;
+		for (int i = 0; i < vertices_and_normals.size(); i+=6)
+		{
+			vertices_and_normals[i] += dx;
+		}
+		auto vert = convert_to_float(vertices_and_normals);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
+
+	}
+};
+
+
+
+
 
 
 const unsigned int width = 800;
@@ -30,17 +98,15 @@ const unsigned int height = 800;
 int main()
 {
 
-	float vertices_blank[10000];
+
 	int indices_blank[10000];
 	float vertices_tool[10000];
 	int indices_tool[10000];
 
-	std::vector<float> vert_blank = Parse_vertices_blank();
-	for (int i = 0; i < vert_blank.size(); ++i)
-	{
-		vertices_blank[i] = vert_blank[i];
-	}
-	for (int i = 0; i < vert_blank.size()/2; ++i)
+	std::vector<float> vertices_blank = Parse_vertices_blank();
+
+
+	for (int i = 0; i < vertices_blank.size()/2; ++i)
 	{
 		indices_blank[i] = i;
 	}
@@ -56,10 +122,6 @@ int main()
 		indices_tool[i] = i;
 	}
 
-
-	Mesh blank;
-
-	std::vector<float> vert_for_print = blank.Get_vertives_to_OpenGl(vert_blank);
 
 
 	// Initialize GLFW
@@ -86,7 +148,7 @@ int main()
 	Shader blank_shaderProgram("default.vert", "default.frag");
 	VAO VAO_blank;
 	VAO_blank.Bind();
-	VBO VBO_blank(vertices_blank, sizeof(vertices_blank));
+	VBO VBO_blank(vertices_blank.data(), vertices_blank.size() * sizeof(float));
 	EBO EBO_blank(indices_blank, sizeof(indices_blank));
 	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -157,8 +219,7 @@ int main()
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-
-
+		//blank.move_x_vert(0.01, VBO_blank);
 
 		/*
 		for (int i = 0; i < vert.size(); i += 6)
@@ -177,6 +238,14 @@ int main()
 		glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_DYNAMIC_DRAW);
 		*/
+
+		for (int i = 0; i < vertices_blank.size(); i += 6)
+		{
+			vertices_blank[i] += 0.1;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
+		glBufferData(GL_ARRAY_BUFFER, vertices_blank.size()*sizeof(float), vertices_blank.data(), GL_DYNAMIC_DRAW);
 
 
 		crntTime = glfwGetTime();

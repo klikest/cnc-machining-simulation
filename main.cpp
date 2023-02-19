@@ -134,9 +134,6 @@ public:
 
 
 
-
-
-
 const unsigned int width = 800;
 const unsigned int height = 800;
 
@@ -148,7 +145,6 @@ int main()
 
 	// Initialize GLFW
 	glfwInit();
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -166,7 +162,6 @@ int main()
 	glViewport(0, 0, width, height);
 
 
-	
 	Shader blank_shaderProgram("default.vert", "default.frag");
 	VAO VAO_blank;
 	VAO_blank.Bind();
@@ -178,7 +173,6 @@ int main()
 	VBO_blank.Unbind();
 	EBO_blank.Unbind();
 	
-
 	Shader tool_shaderProgram("light.vert", "light.frag");
 	VAO VAO_tool;
 	VAO_tool.Bind();
@@ -194,12 +188,9 @@ int main()
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(500.0f, 500.0f, 500.0f);
-
 	glm::vec3 toolPos = glm::vec3(250.0f, 0.0f, -100.0f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
-
 	lightModel = glm::translate(lightModel, toolPos);
-
 	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
 	pyramidModel = glm::translate(pyramidModel, pyramidPos);
@@ -283,13 +274,9 @@ int main()
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
 
-
-		
-
 		blank_shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
-
 
 		VAO_blank.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
@@ -311,17 +298,14 @@ int main()
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		
-		
+				
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-
 
 
 	VAO_blank.Delete();

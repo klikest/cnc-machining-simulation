@@ -54,36 +54,81 @@ public:
 		}
 	}
 
-
-
-
-
-
-
-	
-	float* convert_to_float(std::vector<float> vert_n)
+	void set_vertices(std::vector<float> vetrtices_)
 	{
-		float vert[10000];
-
-		for (int i = 0; i < vert_n.size(); ++i)
-		{
-			vert[i] = vert_n[i];
-		}
-
-		return vert;
+		vertices.clear();
+		vertices = vetrtices_;
 	}
 
-	void move_x_vert(float dx, VBO& VBO)
+	void set_vertices_normals(std::vector<float> vetrtices_)
+	{
+		vertices_and_normals.clear();
+		vertices_and_normals = vetrtices_;
+	}
+
+	std::vector<float> get_vertices()
+	{
+		return vertices;
+	}
+
+	std::vector<float> get_vertices_normals()
+	{
+		return vertices_and_normals;
+	}
+
+	std::vector<int> get_indices()
+	{
+		return indices;
+	}
+
+
+	void move_x_vert(float dx, VBO VBO)
 	{
 		x += dx;
 		for (int i = 0; i < vertices_and_normals.size(); i+=6)
 		{
 			vertices_and_normals[i] += dx;
 		}
-		auto vert = convert_to_float(vertices_and_normals);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices_and_normals.size() * sizeof(float), vertices_and_normals.data(), GL_DYNAMIC_DRAW);
 
+	}
+
+	void move_y_vert(float dy, VBO VBO)
+	{
+		y += dy;
+		for (int i = 0; i < vertices_and_normals.size(); i += 6)
+		{
+			vertices_and_normals[i+1] += dy;
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
+		glBufferData(GL_ARRAY_BUFFER, vertices_and_normals.size() * sizeof(float), vertices_and_normals.data(), GL_DYNAMIC_DRAW);
+
+	}
+
+	void move_z_vert(float dz, VBO VBO)
+	{
+		z += dz;
+		for (int i = 0; i < vertices_and_normals.size(); i += 6)
+		{
+			vertices_and_normals[i+2] += dz;
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
+		glBufferData(GL_ARRAY_BUFFER, vertices_and_normals.size() * sizeof(float), vertices_and_normals.data(), GL_DYNAMIC_DRAW);
+
+	}
+
+	float get_x()
+	{
+		return x;
+	}
+	float get_y()
+	{
+		return y;
+	}
+	float get_z()
+	{
+		return z;
 	}
 };
 
@@ -98,31 +143,8 @@ const unsigned int height = 800;
 int main()
 {
 
-
-	int indices_blank[10000];
-	float vertices_tool[10000];
-	int indices_tool[10000];
-
-	std::vector<float> vertices_blank = Parse_vertices_blank();
-
-
-	for (int i = 0; i < vertices_blank.size()/2; ++i)
-	{
-		indices_blank[i] = i;
-	}
-
-
-	std::vector<float> vert_tool = Parse_vertices_tool();
-	for (int i = 0; i < vert_tool.size(); ++i)
-	{
-		vertices_tool[i] = vert_tool[i];
-	}
-	for (int i = 0; i < vert_tool.size() / 2; ++i)
-	{
-		indices_tool[i] = i;
-	}
-
-
+	Mesh blank(Parse_vertices_blank());
+	Mesh tool(Parse_vertices_tool());
 
 	// Initialize GLFW
 	glfwInit();
@@ -131,7 +153,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "cnc machining sinulator", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -148,8 +170,8 @@ int main()
 	Shader blank_shaderProgram("default.vert", "default.frag");
 	VAO VAO_blank;
 	VAO_blank.Bind();
-	VBO VBO_blank(vertices_blank.data(), vertices_blank.size() * sizeof(float));
-	EBO EBO_blank(indices_blank, sizeof(indices_blank));
+	VBO VBO_blank(blank.get_vertices_normals().data(), blank.get_vertices_normals().size() * sizeof(float));
+	EBO EBO_blank(blank.get_indices().data(), blank.get_indices().size() * sizeof(int));
 	VAO_blank.LinkAttrib(VBO_blank, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO_blank.LinkAttrib(VBO_blank, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO_blank.Unbind();
@@ -160,8 +182,8 @@ int main()
 	Shader tool_shaderProgram("light.vert", "light.frag");
 	VAO VAO_tool;
 	VAO_tool.Bind();
-	VBO VBO_tool(vertices_tool, sizeof(vertices_tool));
-	EBO EBO_tool(indices_tool, sizeof(indices_tool));
+	VBO VBO_tool(tool.get_vertices_normals().data(), tool.get_vertices_normals().size() * sizeof(float));
+	EBO EBO_tool(tool.get_indices().data(), tool.get_indices().size() * sizeof(int));
 	VAO_blank.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
 	VAO_blank.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO_tool.Unbind();
@@ -199,7 +221,7 @@ int main()
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
-	float frame = 0;
+	int frame = 0;
 
 	double prevTime = 0.0f;
 	double crntTime = 0.0f;
@@ -219,34 +241,23 @@ int main()
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//blank.move_x_vert(0.01, VBO_blank);
 
 		/*
-		for (int i = 0; i < vert.size(); i += 6)
+		if (frame < 500)
 		{
-			vert[i] += 0.001;
-			vert[i+1] += 0.001;
-			vert[i+2] += 0.001;
-			
+			blank.move_x_vert(0.1, VBO_blank);
+			frame += 1;
 		}
-
-		for (int i = 0; i < vert.size(); ++i)
+		else if (frame >= 500 && frame < 1000)
 		{
-			vertices0[i] = vert[i];
+			blank.move_x_vert(-0.1, VBO_blank);
+			frame += 1;
 		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_DYNAMIC_DRAW);
+		else if (frame >= 1000)
+		{
+			frame = 0;
+		}
 		*/
-
-		for (int i = 0; i < vertices_blank.size(); i += 6)
-		{
-			vertices_blank[i] += 0.1;
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
-		glBufferData(GL_ARRAY_BUFFER, vertices_blank.size()*sizeof(float), vertices_blank.data(), GL_DYNAMIC_DRAW);
-
 
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -272,37 +283,30 @@ int main()
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
 
+
+		
+
 		blank_shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
 
 
-	/*
-		if (frame % 2 == 0)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_blank), vertices_blank, GL_STATIC_DRAW);
-		}
-		else
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, VBO1.ID);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-		}*/
-
 		VAO_blank.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(indices_blank) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
 		tool_shaderProgram.Activate();
 		camera.Matrix(tool_shaderProgram, "camMatrix");
 		VAO_tool.Bind();
-		glDrawElements(GL_TRIANGLES, sizeof(indices_tool) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 		
-		std::string x_cord = "X = " + std::to_string(frame);
+		std::string x_cord = "X = " + std::to_string(blank.get_x());
+		std::string y_cord = "Y = " + std::to_string(blank.get_y());
+		std::string z_cord = "Z = " + std::to_string(blank.get_z());
 
 		ImGui::Begin("Tool info");
 		ImGui::Text(x_cord.c_str());
-		ImGui::Text("Text 2");
-		ImGui::Text("Text 3");
+		ImGui::Text(y_cord.c_str());
+		ImGui::Text(z_cord.c_str());
 		ImGui::End();
 
 		ImGui::Render();
@@ -312,7 +316,6 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		frame += 0.001;
 	}
 
 	ImGui_ImplOpenGL3_Shutdown();

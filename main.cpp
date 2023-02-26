@@ -24,6 +24,14 @@
 //#include"Mesh.h"
 
 
+#define my_assert(cond)                             \
+    if (!(cond)) {                                  \
+        fprintf(stderr, "MCUT error: %s\n", #cond); \
+        std::exit(1);                               \
+    }
+
+
+
 class Mesh {
 	float x;
 	float y;
@@ -32,26 +40,39 @@ class Mesh {
 	std::vector<float> vertices_and_normals;
 	std::vector<float> vertices;
 	std::vector<int> indices;
+	std::vector<uint32_t> face_sizes;
 
 public:
 	Mesh(std::vector<float> vertices_and_normals_input)
-	{	
+	{
 		x = 0;
 		y = 0;
 		z = 0;
+
 
 		vertices_and_normals = vertices_and_normals_input;
 
 		for (int i = 0; i < vertices_and_normals_input.size(); i += 6)
 		{
 			vertices.push_back(vertices_and_normals_input[i]);
-			vertices.push_back(vertices_and_normals_input[i+1]);
-			vertices.push_back(vertices_and_normals_input[i+2]);
+			vertices.push_back(vertices_and_normals_input[i + 1]);
+			vertices.push_back(vertices_and_normals_input[i + 2]);
 		}
-		for (int i = 0; i < vertices_and_normals_input.size()/2; ++i)
+		for (int i = 0; i < vertices_and_normals_input.size() / 2; ++i)
 		{
 			indices.push_back(i);
 		}
+
+		for (int i = 0; i < indices.size() / 3; ++i)
+		{
+			face_sizes.push_back((uint32_t)3);
+		}
+
+
+
+		std::cout << "Vertices count = " << vertices.size() << std::endl;
+		std::cout << "Indices count = " << indices.size() << std::endl;
+		std::cout << "Face sizes size count = " << face_sizes.size() << std::endl;
 	}
 
 	void set_vertices(std::vector<float> vetrtices_)
@@ -76,16 +97,34 @@ public:
 		return vertices_and_normals;
 	}
 
+	std::vector<uint32_t> get_indices_u()
+	{
+		std::vector<uint32_t> ind;
+		for (int i = 0; i < indices.size(); ++i)
+		{
+			ind.push_back((uint32_t)i);
+		}
+
+
+		return ind;
+	}
+
 	std::vector<int> get_indices()
 	{
+
 		return indices;
+	}
+
+	std::vector<uint32_t> get_face_sizes()
+	{
+		return face_sizes;
 	}
 
 
 	void move_x_vert(float dx, VBO VBO)
 	{
 		x += dx;
-		for (int i = 0; i < vertices_and_normals.size(); i+=6)
+		for (int i = 0; i < vertices_and_normals.size(); i += 6)
 		{
 			vertices_and_normals[i] += dx;
 		}
@@ -99,7 +138,7 @@ public:
 		y += dy;
 		for (int i = 0; i < vertices_and_normals.size(); i += 6)
 		{
-			vertices_and_normals[i+1] += dy;
+			vertices_and_normals[i + 1] += dy;
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
 		glBufferData(GL_ARRAY_BUFFER, vertices_and_normals.size() * sizeof(float), vertices_and_normals.data(), GL_DYNAMIC_DRAW);
@@ -111,7 +150,7 @@ public:
 		z += dz;
 		for (int i = 0; i < vertices_and_normals.size(); i += 6)
 		{
-			vertices_and_normals[i+2] += dz;
+			vertices_and_normals[i + 2] += dz;
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, VBO.ID);
 		glBufferData(GL_ARRAY_BUFFER, vertices_and_normals.size() * sizeof(float), vertices_and_normals.data(), GL_DYNAMIC_DRAW);
@@ -134,6 +173,49 @@ public:
 
 
 
+
+/*
+std::vector<float> calc_normals(std::vector<float> vertices)
+{
+	float x1, y1, z1, x2, y2, z2, x3, y3, z3;
+
+	std::vector<float> P1, P2;
+
+	std::vector<float> normals;
+
+	for (int i = 0; i < vertices.size(); i+=9)
+	{
+		x1 = vertices[i];
+		y1 = vertices[i+1];
+		z1 = vertices[i+2];
+
+		x2 = vertices[i+3];
+		y2 = vertices[i+4];
+		z2 = vertices[i+5];
+
+		x3 = vertices[i+6];
+		y3 = vertices[i+7];
+		z3 = vertices[i+8];
+
+		P1[1] = x1 - x2;
+		P1[2] = y1 - y2;
+		P1[3] = z1 - z2;
+
+		P2[1] = x3 - x2;
+		P2[2] = y3 - y2;
+		P2[3] = z3 - z2;
+
+
+
+	}
+
+	return normals;
+}*/
+
+
+
+
+
 const unsigned int width = 800;
 const unsigned int height = 800;
 
@@ -142,6 +224,40 @@ int main()
 
 	Mesh blank(Parse_vertices_blank());
 	Mesh tool(Parse_vertices_tool());
+
+
+
+	McContext context = MC_NULL_HANDLE;
+	McResult err = mcCreateContext(&context, MC_DEBUG);
+	my_assert(err == MC_NO_ERROR);
+
+	const McFlags booleanUnionFlags = MC_DISPATCH_FILTER_FRAGMENT_SEALING_OUTSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE;
+
+
+	err = mcDispatch(
+		context,
+		MC_DISPATCH_VERTEX_ARRAY_FLOAT | // vertices are in array of doubles
+		MC_DISPATCH_ENFORCE_GENERAL_POSITION | // perturb if necessary
+		booleanUnionFlags, // filter flags which specify the type of output we want
+		// source mesh
+		reinterpret_cast<const void*>(blank.get_vertices().data()),
+		reinterpret_cast<const uint32_t*>(blank.get_indices_u().data()),
+		blank.get_face_sizes().data(),
+		static_cast<uint32_t>(blank.get_vertices().size() / 3),
+		static_cast<uint32_t>(blank.get_face_sizes().size()),
+		// cut mesh
+		reinterpret_cast<const void*>(tool.get_vertices().data()),
+		tool.get_indices_u().data(),
+		tool.get_face_sizes().data(),
+		static_cast<uint32_t>(tool.get_vertices().size() / 3),
+		static_cast<uint32_t>(tool.get_face_sizes().size()));
+
+
+
+
+
+
+
 
 	// Initialize GLFW
 	glfwInit();
@@ -233,7 +349,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 
-		/*
+		
 		if (frame < 500)
 		{
 			blank.move_x_vert(0.1, VBO_blank);
@@ -248,7 +364,7 @@ int main()
 		{
 			frame = 0;
 		}
-		*/
+		
 
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;

@@ -8,8 +8,8 @@
 
 using namespace std;
 
-const char* name_blank = "Models\\blank.stl";
-const char* name_tool = "Models\\tool.stl";
+const char* name_blank = "Models\\tool.stl";
+const char* name_tool = "Models\\cube_2.stl";
 
 
 std::vector<std::string> split(const std::string& string,
@@ -38,8 +38,6 @@ std::vector<std::string> split(const std::string& string,
 vector<float> Parse_vertices_blank()
 {
     vector<float> vertices;
-    vector<float> normals;
-    vector<float> vert ;
 
     std::fstream FileObj;
     FileObj.open(name_blank, std::ios::in);
@@ -51,18 +49,15 @@ vector<float> Parse_vertices_blank()
             std::getline(FileObj, ReadLine, '\n');
 
             string V1 = "0";
-            string V2 = "0";
 
             if (ReadLine.size() > 11)
             {
-            vector<string> mass = split(ReadLine.c_str(), " ");
-            V1 = mass[0];
-            V2 = mass[1];
+                vector<string> mass = split(ReadLine.c_str(), " ");
+                V1 = mass[0];
             }
             else
             {
                 V1 = "0";
-                V2 = "0";
             }
 
             if (V1 == "vertex")
@@ -72,74 +67,23 @@ vector<float> Parse_vertices_blank()
                 vertices.push_back(stof(mass[2]));
                 vertices.push_back(stof(mass[3]));
             }
-
-            else if (V1 == "facet" && V2 == "normal")
-            {
-                vector<string> mass = split(ReadLine.c_str(), " ");
-                normals.push_back(stof(mass[2]));
-                normals.push_back(stof(mass[3]));
-                normals.push_back(stof(mass[4]));
-
-            }
         }
-
-        float x1, y1, z1, x2, y2, z2, x3, y3, z3, nx, ny, nz;
-        int count = 0;
-
-        for (int i = 0; i < vertices.size(); i += 9)
-        {
-            
-            x1 = vertices[i];
-            y1 = vertices[i + 1];
-            z1 = vertices[i + 2];
-
-            x2 = vertices[i + 3]; 
-            y2 = vertices[i + 4];
-            z2 = vertices[i + 5];
-
-            x3 = vertices[i + 6];
-            y3 = vertices[i + 7];
-            z3 = vertices[i + 8];
-
-            nx = normals[count];
-            ny = normals[count + 1];
-            nz = normals[count + 2];
-
-
-
-            vert.push_back(x1);
-            vert.push_back(y1);
-            vert.push_back(z1);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            vert.push_back(x2);
-            vert.push_back(y2);
-            vert.push_back(z2);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            vert.push_back(x3);
-            vert.push_back(y3);
-            vert.push_back(z3);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            count += 3;
-
-        }
-
     }
+
+
 
     else
     {
         std::cout << "Cant open file blank" << std::endl;
     }
 
-	return vert;
+    for (int i = 0; i < vertices.size(); i += 3)
+    {
+        //cout << i/3 + 1 << endl;
+        //cout << vertices[i] << '\t' << vertices[i + 1] << '\t' << vertices[i + 2] << '\n' << endl;
+    }
+
+	return vertices;
 }
 
 
@@ -148,8 +92,6 @@ vector<float> Parse_vertices_blank()
 vector<float> Parse_vertices_tool()
 {
     vector<float> vertices;
-    vector<float> normals;
-    vector<float> vert;
 
     std::fstream FileObj;
     FileObj.open(name_tool, std::ios::in);
@@ -161,18 +103,15 @@ vector<float> Parse_vertices_tool()
             std::getline(FileObj, ReadLine, '\n');
 
             string V1 = "0";
-            string V2 = "0";
 
             if (ReadLine.size() > 11)
             {
                 vector<string> mass = split(ReadLine.c_str(), " ");
                 V1 = mass[0];
-                V2 = mass[1];
             }
             else
             {
                 V1 = "0";
-                V2 = "0";
             }
 
             if (V1 == "vertex")
@@ -182,65 +121,9 @@ vector<float> Parse_vertices_tool()
                 vertices.push_back(stof(mass[2]));
                 vertices.push_back(stof(mass[3]));
             }
-
-            else if (V1 == "facet" && V2 == "normal")
-            {
-                vector<string> mass = split(ReadLine.c_str(), " ");
-                normals.push_back(stof(mass[2]));
-                normals.push_back(stof(mass[3]));
-                normals.push_back(stof(mass[4]));
-
-            }
         }
 
-        float x1, y1, z1, x2, y2, z2, x3, y3, z3, nx, ny, nz;
-        int count = 0;
-
-        for (int i = 0; i < vertices.size(); i += 9)
-        {
-
-            x1 = vertices[i];
-            y1 = vertices[i + 1];
-            z1 = vertices[i + 2];
-
-            x2 = vertices[i + 3];
-            y2 = vertices[i + 4];
-            z2 = vertices[i + 5];
-
-            x3 = vertices[i + 6];
-            y3 = vertices[i + 7];
-            z3 = vertices[i + 8];
-
-            nx = normals[count];
-            ny = normals[count + 1];
-            nz = normals[count + 2];
-
-
-
-            vert.push_back(x1);
-            vert.push_back(y1);
-            vert.push_back(z1);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            vert.push_back(x2);
-            vert.push_back(y2);
-            vert.push_back(z2);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            vert.push_back(x3);
-            vert.push_back(y3);
-            vert.push_back(z3);
-            vert.push_back(nx);
-            vert.push_back(ny);
-            vert.push_back(nz);
-
-            count += 3;
-
-        }
+        
 
     }
 
@@ -249,5 +132,5 @@ vector<float> Parse_vertices_tool()
         std::cout << "Cant open file blank" << std::endl;
     }
 
-    return vert;
+    return vertices;
 }

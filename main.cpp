@@ -39,28 +39,25 @@ class Mesh {
 
 	std::vector<float> vertices_and_normals;
 	std::vector<float> vertices;
+	std::vector<float> normals;
 	std::vector<int> indices;
 	std::vector<uint32_t> face_sizes;
+	std::vector<uint32_t> indices_u;
 
 public:
-	Mesh(std::vector<float> vertices_and_normals_input)
+	Mesh(std::vector<float> vertices_input)
 	{
 		x = 0;
 		y = 0;
 		z = 0;
 
 
-		vertices_and_normals = vertices_and_normals_input;
+		vertices = vertices_input;
 
-		for (int i = 0; i < vertices_and_normals_input.size(); i += 6)
-		{
-			vertices.push_back(vertices_and_normals_input[i]);
-			vertices.push_back(vertices_and_normals_input[i + 1]);
-			vertices.push_back(vertices_and_normals_input[i + 2]);
-		}
-		for (int i = 0; i < vertices_and_normals_input.size() / 2; ++i)
+		for (int i = 0; i < vertices.size()/3; ++i)
 		{
 			indices.push_back(i);
+			indices_u.push_back((uint32_t)i);
 		}
 
 		for (int i = 0; i < indices.size() / 3; ++i)
@@ -68,11 +65,12 @@ public:
 			face_sizes.push_back((uint32_t)3);
 		}
 
+		std::cout << "----------------------------------------------" << std::endl;
+		std::cout << "Vertices count = " << get_vert_count() << std::endl;
+		std::cout << "Indices count = " << get_ind_count() << std::endl;
+		std::cout << "Face size count = " << get_face_sizes().size() << std::endl;
+		std::cout << "----------------------------------------------" << std::endl;
 
-
-		std::cout << "Vertices count = " << vertices.size() << std::endl;
-		std::cout << "Indices count = " << indices.size() << std::endl;
-		std::cout << "Face sizes size count = " << face_sizes.size() << std::endl;
 	}
 
 	void set_vertices(std::vector<float> vetrtices_)
@@ -81,33 +79,65 @@ public:
 		vertices = vetrtices_;
 	}
 
-	void set_vertices_normals(std::vector<float> vetrtices_)
-	{
-		vertices_and_normals.clear();
-		vertices_and_normals = vetrtices_;
-	}
 
 	std::vector<float> get_vertices()
 	{
 		return vertices;
 	}
 
+	std::uint32_t get_vert_count()
+	{
+		return (uint32_t)(vertices.size()/3);
+	}
+
 	std::vector<float> get_vertices_normals()
 	{
+		vertices_and_normals.clear();
+		vertices_and_normals = calc_vert_n();
 		return vertices_and_normals;
 	}
 
-	std::vector<uint32_t> get_indices_u()
+	std::vector<float> calc_vert_n()
 	{
-		std::vector<uint32_t> ind;
-		for (int i = 0; i < indices.size(); ++i)
+		vertices_and_normals.clear();
+
+		calc_normals();
+
+		int count = 0;
+
+		for (int i = 0; i < vertices.size(); i += 9)
 		{
-			ind.push_back((uint32_t)i);
+			vertices_and_normals.push_back(vertices[i]);
+			vertices_and_normals.push_back(vertices[i+1]);
+			vertices_and_normals.push_back(vertices[i+2]);
+
+			vertices_and_normals.push_back(normals[count]);
+			vertices_and_normals.push_back(normals[count +1]);
+			vertices_and_normals.push_back(normals[count +2]);
+
+
+			vertices_and_normals.push_back(vertices[i + 3]);
+			vertices_and_normals.push_back(vertices[i + 4]);
+			vertices_and_normals.push_back(vertices[i + 5]);
+
+			vertices_and_normals.push_back(normals[count]);
+			vertices_and_normals.push_back(normals[count + 1]);
+			vertices_and_normals.push_back(normals[count + 2]);
+
+
+			vertices_and_normals.push_back(vertices[i + 6]);
+			vertices_and_normals.push_back(vertices[i + 7]);
+			vertices_and_normals.push_back(vertices[i + 8]);
+
+			vertices_and_normals.push_back(normals[count]);
+			vertices_and_normals.push_back(normals[count + 1]);
+			vertices_and_normals.push_back(normals[count + 2]);
+
+			count += 3;
 		}
-
-
-		return ind;
+		return vertices_and_normals;
 	}
+
 
 	std::vector<int> get_indices()
 	{
@@ -115,9 +145,67 @@ public:
 		return indices;
 	}
 
+	std::vector<uint32_t> get_indices_u()
+	{
+		return indices_u;
+	}
+
+	std::uint32_t get_ind_count()
+	{
+		return (uint32_t)(indices.size() / 3);
+	}
+
 	std::vector<uint32_t> get_face_sizes()
 	{
 		return face_sizes;
+	}
+
+
+	std::vector<float> calc_normals()
+	{
+		normals.clear();
+
+		float x1, y1, z1, x2, y2, z2, x3, y3, z3;
+
+		std::vector<float> P1, P2, N;
+
+		for (int i = 0; i < vertices.size(); i += 9)
+		{
+			x1 = vertices[i];
+			y1 = vertices[i + 1];
+			z1 = vertices[i + 2];
+
+			x2 = vertices[i + 3];
+			y2 = vertices[i + 4];
+			z2 = vertices[i + 5];
+
+			x3 = vertices[i + 6];
+			y3 = vertices[i + 7];
+			z3 = vertices[i + 8];
+
+			P1.push_back(x1 - x2);
+			P1.push_back(y1 - y2);
+			P1.push_back(z1 - z2);
+
+			P2.push_back(x3 - x2);
+			P2.push_back(y3 - y2);
+			P2.push_back(z3 - z2);
+
+			N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
+			N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
+			N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
+
+			normals.push_back(N[0]);
+			normals.push_back(N[1]);
+			normals.push_back(N[2]);
+
+			P1.clear();
+			P2.clear();
+			N.clear();
+
+		}
+
+		return normals;
 	}
 
 
@@ -172,50 +260,6 @@ public:
 };
 
 
-
-
-/*
-std::vector<float> calc_normals(std::vector<float> vertices)
-{
-	float x1, y1, z1, x2, y2, z2, x3, y3, z3;
-
-	std::vector<float> P1, P2;
-
-	std::vector<float> normals;
-
-	for (int i = 0; i < vertices.size(); i+=9)
-	{
-		x1 = vertices[i];
-		y1 = vertices[i+1];
-		z1 = vertices[i+2];
-
-		x2 = vertices[i+3];
-		y2 = vertices[i+4];
-		z2 = vertices[i+5];
-
-		x3 = vertices[i+6];
-		y3 = vertices[i+7];
-		z3 = vertices[i+8];
-
-		P1[1] = x1 - x2;
-		P1[2] = y1 - y2;
-		P1[3] = z1 - z2;
-
-		P2[1] = x3 - x2;
-		P2[2] = y3 - y2;
-		P2[3] = z3 - z2;
-
-
-
-	}
-
-	return normals;
-}*/
-
-
-
-
-
 const unsigned int width = 800;
 const unsigned int height = 800;
 
@@ -224,39 +268,6 @@ int main()
 
 	Mesh blank(Parse_vertices_blank());
 	Mesh tool(Parse_vertices_tool());
-
-
-
-	McContext context = MC_NULL_HANDLE;
-	McResult err = mcCreateContext(&context, MC_DEBUG);
-	my_assert(err == MC_NO_ERROR);
-
-	const McFlags booleanUnionFlags = MC_DISPATCH_FILTER_FRAGMENT_SEALING_OUTSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE;
-
-
-	err = mcDispatch(
-		context,
-		MC_DISPATCH_VERTEX_ARRAY_FLOAT | // vertices are in array of doubles
-		MC_DISPATCH_ENFORCE_GENERAL_POSITION | // perturb if necessary
-		booleanUnionFlags, // filter flags which specify the type of output we want
-		// source mesh
-		reinterpret_cast<const void*>(blank.get_vertices().data()),
-		reinterpret_cast<const uint32_t*>(blank.get_indices_u().data()),
-		blank.get_face_sizes().data(),
-		static_cast<uint32_t>(blank.get_vertices().size() / 3),
-		static_cast<uint32_t>(blank.get_face_sizes().size()),
-		// cut mesh
-		reinterpret_cast<const void*>(tool.get_vertices().data()),
-		tool.get_indices_u().data(),
-		tool.get_face_sizes().data(),
-		static_cast<uint32_t>(tool.get_vertices().size() / 3),
-		static_cast<uint32_t>(tool.get_face_sizes().size()));
-
-
-
-
-
-
 
 
 	// Initialize GLFW
@@ -304,7 +315,7 @@ int main()
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(500.0f, 500.0f, 500.0f);
-	glm::vec3 toolPos = glm::vec3(250.0f, 0.0f, -100.0f);
+	glm::vec3 toolPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, toolPos);
 	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -349,7 +360,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 
-		
+		/*
 		if (frame < 500)
 		{
 			blank.move_x_vert(0.1, VBO_blank);
@@ -363,7 +374,7 @@ int main()
 		else if (frame >= 1000)
 		{
 			frame = 0;
-		}
+		}*/
 		
 
 		crntTime = glfwGetTime();
@@ -394,11 +405,25 @@ int main()
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
 
+		//glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
+		//glBufferData(GL_ARRAY_BUFFER, tool_vert.size() * sizeof(float), tool_vert.data(), GL_DYNAMIC_DRAW);
+		
+		//glBindVertexArray(VAO_blank.ID);
+		// Draw primitives, number of indices, datatype of indices, index of indices
+		//glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
+
+
+		
+		blank_shaderProgram.Activate();
+		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		camera.Matrix(blank_shaderProgram, "camMatrix");
+
 		VAO_blank.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
 		glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
 		tool_shaderProgram.Activate();
 		camera.Matrix(tool_shaderProgram, "camMatrix");
+
 		VAO_tool.Bind();
 		glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 		

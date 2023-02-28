@@ -79,6 +79,17 @@ public:
 		vertices = vetrtices_;
 	}
 
+	void set_indices(std::vector<uint32_t> indices_)
+	{
+		indices.clear();
+		
+		for (int i = 0; i < indices_.size(); ++i)
+		{
+			int j = (int) indices_[i];
+			indices.push_back(j);
+		}
+	}
+
 
 	std::vector<float> get_vertices()
 	{
@@ -171,38 +182,48 @@ public:
 
 		for (int i = 0; i < vertices.size(); i += 9)
 		{
-			x1 = vertices[i];
-			y1 = vertices[i + 1];
-			z1 = vertices[i + 2];
+			if (vertices.size() > i+9)
+			{
+				x1 = vertices[i];
+				y1 = vertices[i + 1];
+				z1 = vertices[i + 2];
 
-			x2 = vertices[i + 3];
-			y2 = vertices[i + 4];
-			z2 = vertices[i + 5];
+				x2 = vertices[i + 3];
+				y2 = vertices[i + 4];
+				z2 = vertices[i + 5];
 
-			x3 = vertices[i + 6];
-			y3 = vertices[i + 7];
-			z3 = vertices[i + 8];
+				x3 = vertices[i + 6];
+				y3 = vertices[i + 7];
+				z3 = vertices[i + 8];
 
-			P1.push_back(x1 - x2);
-			P1.push_back(y1 - y2);
-			P1.push_back(z1 - z2);
+				P1.push_back(x1 - x2);
+				P1.push_back(y1 - y2);
+				P1.push_back(z1 - z2);
 
-			P2.push_back(x3 - x2);
-			P2.push_back(y3 - y2);
-			P2.push_back(z3 - z2);
+				P2.push_back(x3 - x2);
+				P2.push_back(y3 - y2);
+				P2.push_back(z3 - z2);
 
-			N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
-			N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
-			N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
+				N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
+				N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
+				N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
 
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
+				normals.push_back(N[0]);
+				normals.push_back(N[1]);
+				normals.push_back(N[2]);
 
-			P1.clear();
-			P2.clear();
-			N.clear();
+				P1.clear();
+				P2.clear();
+				N.clear();
+			}
 
+			else
+			{
+				for (int i = 0; i < vertices.size()%9; ++i)
+				{
+					normals.push_back(0.1);
+				}
+			}
 		}
 
 		return normals;
@@ -268,6 +289,119 @@ int main()
 
 	Mesh blank(Parse_vertices_blank());
 	Mesh tool(Parse_vertices_tool());
+
+
+	std::vector<float> cubeVertices = {
+	-5, -5, 5,  // 0
+	5, -5, 5,   // 1
+	5, 5, 5,    //2
+	-5, 5, 5,   //3
+	-5, -5, -5, //4
+	5, -5, -5,  //5
+	5, 5, -5,   //6
+	-5, 5, -5   //7
+	};
+	std::vector<uint32_t> cubeFaces = {
+		0, 1, 2, 3, //0
+		7, 6, 5, 4, //1
+		1, 5, 6, 2, //2
+		0, 3, 7, 4, //3
+		3, 2, 6, 7, //4
+		4, 5, 1, 0  //5
+	};
+	uint32_t cubeFaceSizes[] = {
+		4, 4, 4, 4, 4, 4 };
+	uint32_t numCubeVertices = 8;
+	uint32_t numCubeFaces = 6;
+
+	// the cut mesh
+	// ---------
+	float cutMeshVertices[] = {
+		-20, -4, 0, //0
+		0, 20, 20,  //1
+		20, -4, 0,  //2
+		0, 20, -20  //3
+	};
+	uint32_t cutMeshFaces[] = {
+		0, 1, 2, //0
+		0, 2, 3  //1
+	};
+	//uint32_t cutMeshFaceSizes[] = {
+	//    3, 3};
+	uint32_t numCutMeshVertices = 4;
+	uint32_t numCutMeshFaces = 2;
+
+	// 2. create a context
+	// -------------------
+	McContext context = MC_NULL_HANDLE;
+	McResult err = mcCreateContext(&context, MC_NULL_HANDLE);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "could not create context (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	// 3. do the magic!
+	// ----------------
+	err = mcDispatch(
+		context,
+		MC_DISPATCH_VERTEX_ARRAY_FLOAT,
+		cubeVertices.data(),
+		cubeFaces.data(),
+		cubeFaceSizes,
+		numCubeVertices,
+		numCubeFaces,
+		cutMeshVertices,
+		cutMeshFaces,
+		nullptr, // cutMeshFaceSizes, // no need to give 'faceSizes' parameter since cut-mesh is a triangle mesh
+		numCutMeshVertices,
+		numCutMeshFaces);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "dispatch call failed (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	// 4. query the number of available connected component (all types)
+	// -------------------------------------------------------------
+
+	uint32_t numConnComps;
+	std::vector<McConnectedComponent> connComps;
+	mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_ALL, 0, NULL, &numConnComps);
+	connComps.resize(numConnComps);
+	mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_ALL, (uint32_t)connComps.size(), connComps.data(), NULL);
+
+	std::cout << numConnComps << std::endl;
+
+	McConnectedComponent connComp = connComps[2];
+	uint64_t numBytes = 0;
+
+
+	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, 0, NULL, &numBytes);
+	std::vector<float> vertices_m;
+	vertices_m.resize(numBytes / sizeof(float)); //... or --> numberOfVertices * 3
+	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, numBytes, (void*)vertices_m.data(), NULL);
+
+	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE, 0, NULL, &numBytes);
+	std::vector<uint32_t> faceIndices;
+	faceIndices.resize(numBytes / sizeof(uint32_t));
+	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE, numBytes, faceIndices.data(), NULL);
+
+
+
+	mcReleaseConnectedComponents(context, 0, NULL);
+	mcReleaseContext(context);
+
+	blank.set_vertices(vertices_m);
+	blank.set_indices(faceIndices);
+	blank.calc_vert_n();
+
+
+
+
+
 
 
 	// Initialize GLFW
@@ -424,8 +558,8 @@ int main()
 		tool_shaderProgram.Activate();
 		camera.Matrix(tool_shaderProgram, "camMatrix");
 
-		VAO_tool.Bind();
-		glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
+		//VAO_tool.Bind();
+		//glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 		
 		std::string x_cord = "X = " + std::to_string(blank.get_x());
 		std::string y_cord = "Y = " + std::to_string(blank.get_y());

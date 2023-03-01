@@ -394,9 +394,9 @@ int main()
 	mcReleaseConnectedComponents(context, 0, NULL);
 	mcReleaseContext(context);
 
-	blank.set_vertices(vertices_m);
-	blank.set_indices(faceIndices);
-	blank.calc_vert_n();
+	//blank.set_vertices(vertices_m);
+	//blank.set_indices(faceIndices);
+	//blank.calc_vert_n();
 
 
 

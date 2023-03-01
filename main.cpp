@@ -45,7 +45,7 @@ class Mesh {
 	std::vector<uint32_t> indices_u;
 
 public:
-	Mesh(std::vector<float> vertices_input)
+	Mesh(std::vector<float> vertices_input, std::vector<int> indices_input)
 	{
 		x = 0;
 		y = 0;
@@ -53,11 +53,13 @@ public:
 
 
 		vertices = vertices_input;
+		indices = indices_input;
 
-		for (int i = 0; i < vertices.size()/3; ++i)
+
+
+		for (int i = 0; i < indices.size(); i++)
 		{
-			indices.push_back(i);
-			indices_u.push_back((uint32_t)i);
+			indices_u.push_back((uint32_t)indices[i]);
 		}
 
 		for (int i = 0; i < indices.size() / 3; ++i)
@@ -168,6 +170,7 @@ public:
 
 	std::vector<uint32_t> get_face_sizes()
 	{
+
 		return face_sizes;
 	}
 
@@ -274,13 +277,70 @@ public:
 const unsigned int width = 800;
 const unsigned int height = 800;
 
+
+
+
+
+void draw_model_u(std::vector<float> vertices, std::vector<uint32_t> indices, VBO VBO_, EBO EBO_)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_.ID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_.ID);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_.ID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_.ID);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void draw_model(std::vector<float> vertices, std::vector<int> indices, VBO VBO_, EBO EBO_)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_.ID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_.ID);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), indices.data(), GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_.ID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO_.ID);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+
+
+
 int main()
 {
 
-	Mesh blank(Parse_vertices_blank());
-	Mesh tool(Parse_vertices_tool());
+	Mesh blank(Parse_vertices_blank(), Parse_indices_blank());
+	Mesh tool(Parse_vertices_tool(), Parse_indices_tool());
+
+	std::cout << "Vertices:" << std::endl;
+	for (int i = 0; i < blank.get_vertices().size(); i += 3)
+	{
+		std::cout << blank.get_vertices()[i] << '\t' << blank.get_vertices()[i + 1] << '\t' << blank.get_vertices()[i + 2] << std::endl;
+	}
+	std::cout << "---------------------------------------" << std::endl;
+
+	std::cout << "Indices:" << std::endl;
+	for (int i = 0; i < blank.get_indices().size(); i += 3)
+	{
+		std::cout << blank.get_indices()[i] << '\t' << blank.get_indices()[i + 1] << '\t' << blank.get_indices()[i + 2] << std::endl;
+	}
+	std::cout << "---------------------------------------" << std::endl;
 
 
+	std::cout << "Face sizes:" << std::endl;
+	for (int i = 0; i < blank.get_face_sizes().size(); i++)
+	{
+		std::cout << blank.get_face_sizes()[i] << std::endl;
+	}
+	std::cout << "---------------------------------------" << std::endl;
+
+	
+
+	
+
+
+
+	/*
 	std::vector<float> cubeVertices = {
 	-5, -5, 5,  // 0
 	5, -5, 5,   // 1
@@ -299,27 +359,25 @@ int main()
 		3, 2, 6, 7, //4
 		4, 5, 1, 0  //5
 	};
-	uint32_t cubeFaceSizes[] = {
+	std::vector<uint32_t> cubeFaceSizes = {
 		4, 4, 4, 4, 4, 4 };
 	uint32_t numCubeVertices = 8;
 	uint32_t numCubeFaces = 6;
 
 	// the cut mesh
 	// ---------
-	float cutMeshVertices[] = {
-		-20, -4, 0, //0
-		0, 20, 20,  //1
-		20, -4, 0,  //2
-		0, 20, -20  //3
+	std::vector<float> cutMeshVertices = {
+		0,    -40,   -10, //0
+		0,    0, 200,  //1
+		0,    40, -10 //2
 	};
-	uint32_t cutMeshFaces[] = {
-		0, 1, 2, //0
-		0, 2, 3  //1
+	std::vector<uint32_t> cutMeshFaces = {
+		0, 1, 2 //1
 	};
 	//uint32_t cutMeshFaceSizes[] = {
 	//    3, 3};
-	uint32_t numCutMeshVertices = 4;
-	uint32_t numCutMeshFaces = 2;
+	uint32_t numCutMeshVertices = 3;
+	uint32_t numCutMeshFaces = 1;
 
 	// 2. create a context
 	// -------------------
@@ -339,14 +397,89 @@ int main()
 		MC_DISPATCH_VERTEX_ARRAY_FLOAT,
 		cubeVertices.data(),
 		cubeFaces.data(),
-		cubeFaceSizes,
-		numCubeVertices,
-		numCubeFaces,
-		cutMeshVertices,
-		cutMeshFaces,
+		cubeFaceSizes.data(),
+		cubeVertices.size()/3,
+		cubeFaces.size()/4,
+		cutMeshVertices.data(),
+		cutMeshFaces.data(),
 		nullptr, // cutMeshFaceSizes, // no need to give 'faceSizes' parameter since cut-mesh is a triangle mesh
-		numCutMeshVertices,
-		numCutMeshFaces);
+		cutMeshVertices.size()/3,
+		cutMeshFaces.size()/3 );
+*/
+
+
+
+	std::vector<float> cubeVertices = {
+		-5, -5, 5,  // 0
+		5, -5, 5,   // 1
+		5, 5, 5,    //2
+		-5, 5, 5,   //3
+		-5, -5, -5, //4
+		5, -5, -5,  //5
+		5, 5, -5,   //6
+		-5, 5, -5   //7
+	};
+	std::vector<uint32_t> cubeFaces = {
+		0, 1, 2, 3, //0
+		7, 6, 5, 4, //1
+		1, 5, 6, 2, //2
+		0, 3, 7, 4, //3
+		3, 2, 6, 7, //4
+		4, 5, 1, 0  //5
+	};
+	std::vector<uint32_t> cubeFaceSizes = {
+		4, 4, 4, 4, 4, 4 };
+	uint32_t numCubeVertices = 8;
+	uint32_t numCubeFaces = 6;
+
+	// the cut mesh
+	// ---------
+	std::vector<float> cutMeshVertices = {
+		0,    -400,   -100, //0
+		0,    0, 200,  //1
+		0,    400, -100 //2
+	};
+	std::vector<uint32_t> cutMeshFaces = {
+		0, 1, 2 //1
+	};
+	//uint32_t cutMeshFaceSizes[] = {
+	//    3, 3};
+	uint32_t numCutMeshVertices = 3;
+	uint32_t numCutMeshFaces = 1;
+
+	// 2. create a context
+	// -------------------
+	McContext context = MC_NULL_HANDLE;
+	McResult err = mcCreateContext(&context, MC_NULL_HANDLE);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "could not create context (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	// 3. do the magic!
+	// ----------------
+	err = mcDispatch(
+		context,
+		MC_DISPATCH_VERTEX_ARRAY_FLOAT | // vertices are in array of doubles
+		MC_DISPATCH_ENFORCE_GENERAL_POSITION,
+		reinterpret_cast<const void*>(tool.get_vertices().data()),
+		reinterpret_cast<const uint32_t*>(tool.get_indices_u().data()),
+		tool.get_face_sizes().data(),
+		static_cast<uint32_t>(tool.get_vertices().size() / 3),
+		static_cast<uint32_t>(tool.get_face_sizes().size()),
+		cutMeshVertices.data(),
+		cutMeshFaces.data(),
+		nullptr, // cutMeshFaceSizes, // no need to give 'faceSizes' parameter since cut-mesh is a triangle mesh
+		cutMeshVertices.size() / 3,
+		cutMeshFaces.size() / 3);
+
+
+
+
+
+
 
 	if (err != MC_NO_ERROR)
 	{
@@ -365,33 +498,61 @@ int main()
 
 	std::cout << numConnComps << std::endl;
 
-	McConnectedComponent connComp = connComps[2];
+	McConnectedComponent connComp = connComps[0];
 	uint64_t numBytes = 0;
+	// query the vertices
+	// ----------------------
 
+	numBytes = 0;
+	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, 0, NULL, &numBytes);
 
-	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, 0, NULL, &numBytes);
-	std::vector<float> vertices_m;
-	vertices_m.resize(numBytes / sizeof(float)); //... or --> numberOfVertices * 3
-	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, numBytes, (void*)vertices_m.data(), NULL);
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "1:mcGetConnectedComponentData(MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT) failed (err=%d)\n", (int)err);
+		exit(1);
+	}
 
-	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE, 0, NULL, &numBytes);
-	std::vector<uint32_t> faceIndices;
-	faceIndices.resize(numBytes / sizeof(uint32_t));
-	mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE, numBytes, faceIndices.data(), NULL);
+	uint32_t numberOfVertices = (uint32_t)(numBytes / (sizeof(float) * 3));
+
+	std::vector<float> vertices(numberOfVertices * 3u);
+
+	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT, numBytes, (void*)vertices.data(), NULL);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "2:mcGetConnectedComponentData(MC_CONNECTED_COMPONENT_DATA_VERTEX_FLOAT) failed (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	// query the faces
+	// -------------------
+
+	numBytes = 0;
+	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, 0, NULL, &numBytes);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "1:mcGetConnectedComponentData(MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION) failed (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	std::vector<uint32_t> triangulationIndices;
+	triangulationIndices.resize(numBytes / sizeof(uint32_t));
+
+	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, numBytes, triangulationIndices.data(), NULL);
+
+	if (err != MC_NO_ERROR)
+	{
+		fprintf(stderr, "2:mcGetConnectedComponentData(MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION) failed (err=%d)\n", (int)err);
+		exit(1);
+	}
+
+	std::vector<uint32_t> faceSizes(triangulationIndices.size() / 3, 3);
 
 
 
 	mcReleaseConnectedComponents(context, 0, NULL);
 	mcReleaseContext(context);
-
-	//blank.set_vertices(vertices_m);
-	//blank.set_indices(faceIndices);
-	//blank.calc_vert_n();
-
-
-
-
-
 
 
 	// Initialize GLFW
@@ -413,6 +574,9 @@ int main()
 	glViewport(0, 0, width, height);
 
 
+
+
+
 	Shader blank_shaderProgram("default.vert", "default.frag");
 	VAO VAO_blank;
 	VAO_blank.Bind();
@@ -424,18 +588,16 @@ int main()
 	VBO_blank.Unbind();
 	EBO_blank.Unbind();
 	
-	Shader tool_shaderProgram("light.vert", "light.frag");
+	Shader tool_shaderProgram("tool.vert", "tool.frag");
 	VAO VAO_tool;
 	VAO_tool.Bind();
-	VBO VBO_tool(tool.get_vertices_normals().data(), tool.get_vertices_normals().size() * sizeof(float));
+	VBO VBO_tool(tool.get_vertices().data(), tool.get_vertices().size() * sizeof(float));
 	EBO EBO_tool(tool.get_indices().data(), tool.get_indices().size() * sizeof(int));
-	VAO_blank.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	VAO_blank.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO_blank.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	//VAO_blank.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO_tool.Unbind();
 	VBO_tool.Unbind();
 	EBO_tool.Unbind();
-
-
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(500.0f, 500.0f, 500.0f);
@@ -456,9 +618,6 @@ int main()
 	glUniform4f(glGetUniformLocation(blank_shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-	//glEnableVertexAttribArray(0);
-	//glEnableVertexAttribArray(1);
-
 	glEnable(GL_DEPTH_TEST);
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -471,6 +630,11 @@ int main()
 	unsigned int counter = 0;
 
 
+	bool draw_cut_mesh = false;
+	bool draw_src_mesh = false;
+	bool draw_result = false;
+
+
 	glfwSwapInterval(1);
 
 	IMGUI_CHECKVERSION();
@@ -480,26 +644,9 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
-	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
 
-		/*
-		if (frame < 500)
-		{
-			blank.move_x_vert(0.1, VBO_blank);
-			frame += 1;
-		}
-		else if (frame >= 500 && frame < 1000)
-		{
-			blank.move_x_vert(-0.1, VBO_blank);
-			frame += 1;
-		}
-		else if (frame >= 1000)
-		{
-			frame = 0;
-		}*/
-		
 
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -525,40 +672,51 @@ int main()
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
 
+
 		blank_shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
-
-		//glBindBuffer(GL_ARRAY_BUFFER, VBO_blank.ID);
-		//glBufferData(GL_ARRAY_BUFFER, tool_vert.size() * sizeof(float), tool_vert.data(), GL_DYNAMIC_DRAW);
-		
-		//glBindVertexArray(VAO_blank.ID);
-		// Draw primitives, number of indices, datatype of indices, index of indices
+		VAO_blank.Bind();
 		//glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
 
 
-		
-		blank_shaderProgram.Activate();
-		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
-		camera.Matrix(blank_shaderProgram, "camMatrix");
 
-		VAO_blank.Bind();
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
 		tool_shaderProgram.Activate();
+		VAO_tool.Bind();
+		//glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
+
 		camera.Matrix(tool_shaderProgram, "camMatrix");
 
-		//VAO_tool.Bind();
-		//glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 		
 		std::string x_cord = "X = " + std::to_string(blank.get_x());
 		std::string y_cord = "Y = " + std::to_string(blank.get_y());
 		std::string z_cord = "Z = " + std::to_string(blank.get_z());
 
+
+
+		if (draw_cut_mesh)
+		{
+			draw_model_u(cutMeshVertices, cutMeshFaces, VBO_tool, EBO_tool);
+		}
+
+		else if (draw_src_mesh)
+		{
+			draw_model_u(blank.get_vertices(), blank.get_indices_u(), VBO_tool, EBO_tool);
+		}
+		else if (draw_result)
+		{
+			draw_model_u(vertices, triangulationIndices, VBO_tool, EBO_tool);
+		}
+
+
+
 		ImGui::Begin("Tool info");
-		ImGui::Text(x_cord.c_str());
-		ImGui::Text(y_cord.c_str());
-		ImGui::Text(z_cord.c_str());
+		ImGui::Checkbox("Draw cut mesh", &draw_cut_mesh);
+		ImGui::Checkbox("Draw src mesh", &draw_src_mesh);
+		ImGui::Checkbox("Draw result mesh", &draw_result);
+		//ImGui::Text(x_cord.c_str());
+		//ImGui::Text(y_cord.c_str());
+		//ImGui::Text(z_cord.c_str());
 		ImGui::End();
 
 		ImGui::Render();

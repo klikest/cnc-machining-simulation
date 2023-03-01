@@ -118,13 +118,19 @@
     <None Include="default.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="light.frag">
+    <None Include="tool.frag">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="default.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="light.vert">
+    <None Include="tool.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="test.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

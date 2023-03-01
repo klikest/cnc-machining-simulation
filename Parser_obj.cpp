@@ -8,8 +8,8 @@
 
 using namespace std;
 
-const char* name_blank = "Models\\cube.stl";
-const char* name_tool = "Models\\cube_2.stl";
+const char* name_blank = "Models\\cube_blank.obj";
+const char* name_tool = "Models\\cube_tool.obj";
 
 
 std::vector<std::string> split(const std::string& string,
@@ -48,19 +48,10 @@ vector<float> Parse_vertices_blank()
         {
             std::getline(FileObj, ReadLine, '\n');
 
-            string V1 = "0";
+            char V1 = ReadLine.c_str()[0],
+                V2 = ReadLine.c_str()[1];
 
-            if (ReadLine.size() > 11)
-            {
-                vector<string> mass = split(ReadLine.c_str(), " ");
-                V1 = mass[0];
-            }
-            else
-            {
-                V1 = "0";
-            }
-
-            if (V1 == "vertex")
+            if (V1 == 'v' && V2 == ' ')
             {
                 vector<string> mass = split(ReadLine.c_str(), " ");
                 vertices.push_back(stof(mass[1]));
@@ -71,20 +62,54 @@ vector<float> Parse_vertices_blank()
     }
 
 
+    else
+    {
+        std::cout << "Cant open file blank" << std::endl;
+    }
+
+	return vertices;
+}
+
+
+vector<int> Parse_indices_blank()
+{
+    vector<int> indices;
+
+    std::fstream FileObj;
+    FileObj.open(name_blank, std::ios::in);
+    if (FileObj.is_open())
+    {
+        std::string ReadLine;
+        while (!FileObj.eof())
+        {
+            std::getline(FileObj, ReadLine, '\n');
+
+            char V1 = ReadLine.c_str()[0],
+                V2 = ReadLine.c_str()[1];
+
+            if (V1 == 'f' && V2 == ' ')
+            {
+                vector<string> mass = split(ReadLine.c_str(), " ");
+                indices.push_back(stof(mass[1]));
+                indices.push_back(stof(mass[2]));
+                indices.push_back(stof(mass[3]));
+            }
+        }
+    }
+
 
     else
     {
         std::cout << "Cant open file blank" << std::endl;
     }
 
-    for (int i = 0; i < vertices.size(); i += 3)
-    {
-        //cout << i/3 + 1 << endl;
-        //cout << vertices[i] << '\t' << vertices[i + 1] << '\t' << vertices[i + 2] << '\n' << endl;
-    }
-
-	return vertices;
+    return indices;
 }
+
+
+
+
+
 
 
 
@@ -102,19 +127,10 @@ vector<float> Parse_vertices_tool()
         {
             std::getline(FileObj, ReadLine, '\n');
 
-            string V1 = "0";
+            char V1 = ReadLine.c_str()[0],
+                V2 = ReadLine.c_str()[1];
 
-            if (ReadLine.size() > 11)
-            {
-                vector<string> mass = split(ReadLine.c_str(), " ");
-                V1 = mass[0];
-            }
-            else
-            {
-                V1 = "0";
-            }
-
-            if (V1 == "vertex")
+            if (V1 == 'v' && V2 == ' ')
             {
                 vector<string> mass = split(ReadLine.c_str(), " ");
                 vertices.push_back(stof(mass[1]));
@@ -122,9 +138,6 @@ vector<float> Parse_vertices_tool()
                 vertices.push_back(stof(mass[3]));
             }
         }
-
-        
-
     }
 
     else
@@ -133,4 +146,41 @@ vector<float> Parse_vertices_tool()
     }
 
     return vertices;
+}
+
+
+
+vector<int> Parse_indices_tool()
+{
+    vector<int> indices;
+
+    std::fstream FileObj;
+    FileObj.open(name_tool, std::ios::in);
+    if (FileObj.is_open())
+    {
+        std::string ReadLine;
+        while (!FileObj.eof())
+        {
+            std::getline(FileObj, ReadLine, '\n');
+
+            char V1 = ReadLine.c_str()[0],
+                V2 = ReadLine.c_str()[1];
+
+            if (V1 == 'f' && V2 == ' ')
+            {
+                vector<string> mass = split(ReadLine.c_str(), " ");
+                indices.push_back(stof(mass[1]));
+                indices.push_back(stof(mass[2]));
+                indices.push_back(stof(mass[3]));
+            }
+        }
+    }
+
+
+    else
+    {
+        std::cout << "Cant open file blank" << std::endl;
+    }
+
+    return indices;
 }

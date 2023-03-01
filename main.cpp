@@ -182,8 +182,6 @@ public:
 
 		for (int i = 0; i < vertices.size(); i += 9)
 		{
-			if (vertices.size() > i+9)
-			{
 				x1 = vertices[i];
 				y1 = vertices[i + 1];
 				z1 = vertices[i + 2];
@@ -215,15 +213,7 @@ public:
 				P1.clear();
 				P2.clear();
 				N.clear();
-			}
 
-			else
-			{
-				for (int i = 0; i < vertices.size()%9; ++i)
-				{
-					normals.push_back(0.1);
-				}
-			}
 		}
 
 		return normals;

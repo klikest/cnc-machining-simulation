@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const char* name_blank = "Models\\cube_blank.obj";
+const char* name_blank = "Models\\cube.obj";
 const char* name_tool = "Models\\cube_tool.obj";
 
 

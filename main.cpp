@@ -15,6 +15,8 @@
 
 #include <map>
 
+
+
 #include"shaderClass.h"
 #include"VAO.h"
 #include"VBO.h"
@@ -312,125 +314,45 @@ int main()
 	Mesh blank(Parse_vertices_blank(), Parse_indices_blank());
 	Mesh tool(Parse_vertices_tool(), Parse_indices_tool());
 
-	std::cout << "Vertices:" << std::endl;
-	for (int i = 0; i < blank.get_vertices().size(); i += 3)
-	{
-		std::cout << blank.get_vertices()[i] << '\t' << blank.get_vertices()[i + 1] << '\t' << blank.get_vertices()[i + 2] << std::endl;
-	}
-	std::cout << "---------------------------------------" << std::endl;
-
-	std::cout << "Indices:" << std::endl;
-	for (int i = 0; i < blank.get_indices().size(); i += 3)
-	{
-		std::cout << blank.get_indices()[i] << '\t' << blank.get_indices()[i + 1] << '\t' << blank.get_indices()[i + 2] << std::endl;
-	}
-	std::cout << "---------------------------------------" << std::endl;
-
-
-	std::cout << "Face sizes:" << std::endl;
-	for (int i = 0; i < blank.get_face_sizes().size(); i++)
-	{
-		std::cout << blank.get_face_sizes()[i] << std::endl;
-	}
-	std::cout << "---------------------------------------" << std::endl;
-
-	
-
-	
-
-
-
-	/*
-	std::vector<float> cubeVertices = {
-	-5, -5, 5,  // 0
-	5, -5, 5,   // 1
-	5, 5, 5,    //2
-	-5, 5, 5,   //3
-	-5, -5, -5, //4
-	5, -5, -5,  //5
-	5, 5, -5,   //6
-	-5, 5, -5   //7
+	std::vector<double> cubeVertices = {
+	1.0, 1.0, -1.0,
+	1.0, -1.0, -1.0,
+	1.0, 1.0, 1.0,
+	1.0, -1.0, 1.0,
+	-1.0, 1.0, -1.0,
+	-1.0, -1.0, -1.0,
+	-1.0, 1.0, 1.0,
+	-1.0, -1.0, 1.0
 	};
 	std::vector<uint32_t> cubeFaces = {
-		0, 1, 2, 3, //0
-		7, 6, 5, 4, //1
-		1, 5, 6, 2, //2
-		0, 3, 7, 4, //3
-		3, 2, 6, 7, //4
-		4, 5, 1, 0  //5
+		5, 3, 1,
+		3, 8, 4,
+		7, 6, 8,
+		2, 8, 6,
+		1, 4, 2,
+		5, 2, 6,
+		5, 7, 3,
+		3, 7, 8,
+		7, 5, 6,
+		2, 4, 8,
+		1, 3, 4,
+		5, 1, 2
 	};
 	std::vector<uint32_t> cubeFaceSizes = {
-		4, 4, 4, 4, 4, 4 };
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3 };
 	uint32_t numCubeVertices = 8;
-	uint32_t numCubeFaces = 6;
-
-	// the cut mesh
-	// ---------
-	std::vector<float> cutMeshVertices = {
-		0,    -40,   -10, //0
-		0,    0, 200,  //1
-		0,    40, -10 //2
-	};
-	std::vector<uint32_t> cutMeshFaces = {
-		0, 1, 2 //1
-	};
-	//uint32_t cutMeshFaceSizes[] = {
-	//    3, 3};
-	uint32_t numCutMeshVertices = 3;
-	uint32_t numCutMeshFaces = 1;
-
-	// 2. create a context
-	// -------------------
-	McContext context = MC_NULL_HANDLE;
-	McResult err = mcCreateContext(&context, MC_NULL_HANDLE);
-
-	if (err != MC_NO_ERROR)
-	{
-		fprintf(stderr, "could not create context (err=%d)\n", (int)err);
-		exit(1);
-	}
-
-	// 3. do the magic!
-	// ----------------
-	err = mcDispatch(
-		context,
-		MC_DISPATCH_VERTEX_ARRAY_FLOAT,
-		cubeVertices.data(),
-		cubeFaces.data(),
-		cubeFaceSizes.data(),
-		cubeVertices.size()/3,
-		cubeFaces.size()/4,
-		cutMeshVertices.data(),
-		cutMeshFaces.data(),
-		nullptr, // cutMeshFaceSizes, // no need to give 'faceSizes' parameter since cut-mesh is a triangle mesh
-		cutMeshVertices.size()/3,
-		cutMeshFaces.size()/3 );
-*/
-
-
-
-	std::vector<float> cubeVertices = {
-		-5, -5, 5,  // 0
-		5, -5, 5,   // 1
-		5, 5, 5,    //2
-		-5, 5, 5,   //3
-		-5, -5, -5, //4
-		5, -5, -5,  //5
-		5, 5, -5,   //6
-		-5, 5, -5   //7
-	};
-	std::vector<uint32_t> cubeFaces = {
-		0, 1, 2, 3, //0
-		7, 6, 5, 4, //1
-		1, 5, 6, 2, //2
-		0, 3, 7, 4, //3
-		3, 2, 6, 7, //4
-		4, 5, 1, 0  //5
-	};
-	std::vector<uint32_t> cubeFaceSizes = {
-		4, 4, 4, 4, 4, 4 };
-	uint32_t numCubeVertices = 8;
-	uint32_t numCubeFaces = 6;
+	uint32_t numCubeFaces = 12;
 
 	// the cut mesh
 	// ---------
@@ -462,13 +384,12 @@ int main()
 	// ----------------
 	err = mcDispatch(
 		context,
-		MC_DISPATCH_VERTEX_ARRAY_FLOAT | // vertices are in array of doubles
-		MC_DISPATCH_ENFORCE_GENERAL_POSITION,
-		reinterpret_cast<const void*>(tool.get_vertices().data()),
-		reinterpret_cast<const uint32_t*>(tool.get_indices_u().data()),
-		tool.get_face_sizes().data(),
-		static_cast<uint32_t>(tool.get_vertices().size() / 3),
-		static_cast<uint32_t>(tool.get_face_sizes().size()),
+		MC_DISPATCH_VERTEX_ARRAY_DOUBLE,
+		cubeVertices.data(),
+		cubeFaces.data(),
+		cubeFaceSizes.data(),
+		numCubeVertices,
+		numCubeFaces,
 		cutMeshVertices.data(),
 		cutMeshFaces.data(),
 		nullptr, // cutMeshFaceSizes, // no need to give 'faceSizes' parameter since cut-mesh is a triangle mesh

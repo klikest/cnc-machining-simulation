@@ -9,7 +9,7 @@
 using namespace std;
 
 const char* name_blank = "Models\\cube.obj";
-const char* name_tool = "Models\\cube_tool.obj";
+const char* name_tool = "Models\\pir.obj";
 
 
 std::vector<std::string> split(const std::string& string,
@@ -133,16 +133,16 @@ vector<float> Parse_vertices_tool()
             if (V1 == 'v' && V2 == ' ')
             {
                 vector<string> mass = split(ReadLine.c_str(), " ");
-                vertices.push_back(stof(mass[1]));
-                vertices.push_back(stof(mass[2]));
-                vertices.push_back(stof(mass[3]));
+                vertices.push_back(stof(mass[1]) * 1000);
+                vertices.push_back(stof(mass[2]) * 1000);
+                vertices.push_back(stof(mass[3]) * 1000);
             }
         }
     }
 
     else
     {
-        std::cout << "Cant open file blank" << std::endl;
+        std::cout << "Cant open file tool" << std::endl;
     }
 
     return vertices;
@@ -179,8 +179,14 @@ vector<int> Parse_indices_tool()
 
     else
     {
-        std::cout << "Cant open file blank" << std::endl;
+        std::cout << "Cant open file tool" << std::endl;
     }
+
+    for (int i = 0; i < indices.size(); i++)
+    {
+        cout << indices[i] << endl;
+    }
+        
 
     return indices;
 }

@@ -373,7 +373,6 @@ std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> v
 		V1 = indices[i];
 		V2 = indices[i + 1];
 		V3 = indices[i + 2];
-
 		x1 = vert_by_num[V1][0];
 		y1 = vert_by_num[V1][1];
 		z1 = vert_by_num[V1][2];
@@ -383,38 +382,27 @@ std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> v
 		x3 = vert_by_num[V3][0];
 		y3 = vert_by_num[V3][1];
 		z3 = vert_by_num[V3][2];
-
-
 		P1.push_back(x1 - x2);
 		P1.push_back(y1 - y2);
 		P1.push_back(z1 - z2);
-
 		P2.push_back(x3 - x2);
 		P2.push_back(y3 - y2);
 		P2.push_back(z3 - z2);
-
 		N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
 		N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
 		N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
-
-		//ind_and_vert.push_back(i);
-		//ind_and_vert.push_back(i+1);
-		//ind_and_vert.push_back(i+2);
-
 		ind_and_vert.push_back(x1);
 		ind_and_vert.push_back(y1);
 		ind_and_vert.push_back(z1);
 		ind_and_vert.push_back(N[0]);
 		ind_and_vert.push_back(N[1]);
 		ind_and_vert.push_back(N[2]);
-
 		ind_and_vert.push_back(x2);
 		ind_and_vert.push_back(y2);
 		ind_and_vert.push_back(z2);
 		ind_and_vert.push_back(N[0]);
 		ind_and_vert.push_back(N[1]);
 		ind_and_vert.push_back(N[2]);
-
 		ind_and_vert.push_back(x3);
 		ind_and_vert.push_back(y3);
 		ind_and_vert.push_back(z3);
@@ -428,7 +416,6 @@ std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> v
 	}
 
 	return ind_and_vert;
-
 }
 
 
@@ -673,8 +660,8 @@ int main()
 	VAO_tool.Bind();
 	VBO VBO_tool(tool.get_vertices().data(), tool.get_vertices().size() * sizeof(float));
 	EBO EBO_tool(tool.get_indices().data(), tool.get_indices().size() * sizeof(int));
-	VAO_tool.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
-	//VAO_tool.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO_tool.LinkAttrib(VBO_tool, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO_tool.LinkAttrib(VBO_tool, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO_tool.Unbind();
 	VBO_tool.Unbind();
 	EBO_tool.Unbind();
@@ -753,25 +740,11 @@ int main()
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 10000.0f);
 
-
-		//blank_shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
-		//glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
-
-
-
-		
-		//VAO_tool.Bind();
-		//glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 
 		camera.Matrix(tool_shaderProgram, "camMatrix");
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-		//blank.set_vertices(s_vert);
-		//blank.set_indices(s_ind);
-
 
 		if (draw_cut_mesh)
 		{

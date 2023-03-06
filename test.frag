@@ -3,6 +3,10 @@
 // Outputs colors in RGBA
 out vec4 FragColor;
 
+
+
+// Imports the normal from the Vertex Shader
+in vec3 Normal;
 // Imports the current position from the Vertex Shader
 in vec3 crntPos;
 
@@ -16,7 +20,22 @@ uniform vec3 camPos;
 
 void main()
 {
+	
+	// ambient lighting
+	float ambient = 0.60f;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightPos - crntPos);
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
+
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 8);
+	float specular = specAmount * specularLight;
 
 	// outputs final color
-	FragColor =  vec4((crntPos), 1);
+	FragColor =  vec4(0.64, 0.64, 0.64, 1) * lightColor * (diffuse + ambient + specular);
 }

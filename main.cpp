@@ -370,6 +370,7 @@ std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> v
 
 	for (int i = 0; i < indices.size(); i += 3)
 	{
+		//
 		V1 = indices[i];
 		V2 = indices[i + 1];
 		V3 = indices[i + 2];

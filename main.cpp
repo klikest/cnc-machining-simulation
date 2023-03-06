@@ -178,7 +178,12 @@ public:
 
 		std::vector<std::vector<float>> vert;
 
+		
+
 		std::vector<float> coords;
+		
+		std::vector<uint32_t> ind;
+
 
 		for (int i = 0; i < vertices.size(); i += 3)
 		{
@@ -190,20 +195,18 @@ public:
 		}
 
 
+
 		for (int i = 0; i < indices.size(); i += 3)
 		{
 			V1 = indices[i];
-			V2 = indices[i+1];
-			V3 = indices[i+2];
-
+			V2 = indices[i + 1];
+			V3 = indices[i + 2];
 			x1 = vert[V1][0];
 			y1 = vert[V1][1];
 			z1 = vert[V1][2];
-
 			x2 = vert[V2][0];
 			y2 = vert[V2][1];
 			z2 = vert[V2][2];
-
 			x3 = vert[V3][0];
 			y3 = vert[V3][1];
 			z3 = vert[V3][2];
@@ -220,39 +223,44 @@ public:
 			N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
 			N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
 
-
-			normals.push_back(vert[V1][0]);
-			normals.push_back(vert[V1][1]);
-			normals.push_back(vert[V1][2]);
-
+			normals.push_back(x1);
+			normals.push_back(y1);
+			normals.push_back(z1);
+			normals.push_back(N[0]);
+			normals.push_back(N[1]);
+			normals.push_back(N[2]);
+			normals.push_back(x2);
+			normals.push_back(y2);
+			normals.push_back(z2);
+			normals.push_back(N[0]);
+			normals.push_back(N[1]);
+			normals.push_back(N[2]);
+			normals.push_back(x3);
+			normals.push_back(y3);
+			normals.push_back(z3);
 			normals.push_back(N[0]);
 			normals.push_back(N[1]);
 			normals.push_back(N[2]);
 
-
-			normals.push_back(vert[V2][0]);
-			normals.push_back(vert[V2][1]);
-			normals.push_back(vert[V2][2]);
-
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
-
-
-			normals.push_back(vert[V3][0]);
-			normals.push_back(vert[V3][1]);
-			normals.push_back(vert[V3][2]);
-
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
 			P1.clear();
 			P2.clear();
 			N.clear();
+
+
 		}
 
+		for (uint32_t i = 0; i < normals.size() / 6; ++i)
+		{
+			ind.push_back(i);
+		}
+
+		set_indices(ind);
 
 		return normals;
+
+		normals.clear();
+		vert.clear();
+		ind.clear();
 	}
 
 
@@ -338,6 +346,94 @@ void draw_model(std::vector<float> vertices, std::vector<int> indices, VBO VBO_,
 
 
 
+
+
+std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> vertices)
+{
+
+	std::vector<float> ind_and_vert;
+
+	std::vector<std::vector<float>> vert_by_num;
+	std::vector<float> P1, P2, N;
+
+	int V1, V2, V3;
+
+	float x1, y1, z1, x2, y2, z2, x3, y3, z3;
+
+
+	for (int i = 0; i < vertices.size(); i += 3)
+	{
+		vert_by_num.push_back( {vertices[i], vertices[i+1], vertices[i+2]} );
+	}
+
+
+
+	for (int i = 0; i < indices.size(); i += 3)
+	{
+		V1 = indices[i];
+		V2 = indices[i + 1];
+		V3 = indices[i + 2];
+
+		x1 = vert_by_num[V1][0];
+		y1 = vert_by_num[V1][1];
+		z1 = vert_by_num[V1][2];
+		x2 = vert_by_num[V2][0];
+		y2 = vert_by_num[V2][1];
+		z2 = vert_by_num[V2][2];
+		x3 = vert_by_num[V3][0];
+		y3 = vert_by_num[V3][1];
+		z3 = vert_by_num[V3][2];
+
+
+		P1.push_back(x1 - x2);
+		P1.push_back(y1 - y2);
+		P1.push_back(z1 - z2);
+
+		P2.push_back(x3 - x2);
+		P2.push_back(y3 - y2);
+		P2.push_back(z3 - z2);
+
+		N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
+		N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
+		N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
+
+		//ind_and_vert.push_back(i);
+		//ind_and_vert.push_back(i+1);
+		//ind_and_vert.push_back(i+2);
+
+		ind_and_vert.push_back(x1);
+		ind_and_vert.push_back(y1);
+		ind_and_vert.push_back(z1);
+		ind_and_vert.push_back(N[0]);
+		ind_and_vert.push_back(N[1]);
+		ind_and_vert.push_back(N[2]);
+
+		ind_and_vert.push_back(x2);
+		ind_and_vert.push_back(y2);
+		ind_and_vert.push_back(z2);
+		ind_and_vert.push_back(N[0]);
+		ind_and_vert.push_back(N[1]);
+		ind_and_vert.push_back(N[2]);
+
+		ind_and_vert.push_back(x3);
+		ind_and_vert.push_back(y3);
+		ind_and_vert.push_back(z3);
+		ind_and_vert.push_back(N[0]);
+		ind_and_vert.push_back(N[1]);
+		ind_and_vert.push_back(N[2]);
+
+		P1.clear();
+		P2.clear();
+		N.clear();
+	}
+
+	return ind_and_vert;
+
+}
+
+
+
+
 int main()
 {
 
@@ -353,7 +449,8 @@ int main()
 	// -----------------
 	InputMesh srcMesh;
 
-
+	std::vector<float> s_vert;
+	std::vector<uint32_t> s_ind;
 	srcMesh.fpath = "Models\\cube.obj";
 	bool srcMeshLoaded = igl::read_triangle_mesh(srcMesh.fpath, srcMesh.V, srcMesh.F);
 
@@ -369,6 +466,10 @@ int main()
 		srcMesh.vertexCoordsArray.push_back(v[0]);
 		srcMesh.vertexCoordsArray.push_back(v[1]);
 		srcMesh.vertexCoordsArray.push_back(v[2]);
+
+		s_vert.push_back(v[0]);
+		s_vert.push_back(v[1]);
+		s_vert.push_back(v[2]);
 	}
 
 	// copy faces
@@ -376,6 +477,7 @@ int main()
 		const std::vector<int>& f = srcMesh.F[i];
 		for (int j = 0; j < (int)f.size(); ++j) {
 			srcMesh.faceIndicesArray.push_back(f[j]);
+			s_ind.push_back(f[j]);
 		}
 
 		srcMesh.faceSizesArray.push_back((uint32_t)f.size());
@@ -490,9 +592,11 @@ int main()
 	for (int i = 0; i < ccVertices.size(); ++i)
 	{
 		vert_res.push_back((float)ccVertices[i]*100);
-		std::cout << ccVertices[i] * 100 << std::endl;
+		//std::cout << ccVertices[i] * 100 << std::endl;
 	}
 
+	blank.set_vertices(s_vert);
+	//tool.set_vertices(vert_res);
 	tool.set_vertices(vert_res);
 
 
@@ -508,14 +612,16 @@ int main()
 	err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, numBytes, ccFaceIndices.data(), NULL);
 	my_assert(err == MC_NO_ERROR);
 
+	blank.set_indices(s_ind);
+	//tool.set_indices(ccFaceIndices);
 	tool.set_indices(ccFaceIndices);
-
+	/*
 	for (int i = 0; i < tool.get_indices().size(); i += 3)
 	{
 		std::cout << tool.get_indices()[i] << '\t' << tool.get_indices()[i + 1] << '\t' << tool.get_indices()[i + 2] << std::endl; 
 	}
 	std::cout << tool.get_vertices().size() << std::endl;
-
+	*/
 
 
 	// Initialize GLFW
@@ -535,6 +641,17 @@ int main()
 
 	gladLoadGL();
 	glViewport(0, 0, width, height);
+
+
+
+
+	std::vector<float> ind_vert = calc_norm(ccFaceIndices, vert_res);
+
+	std::vector<int> indices_;
+	for (int i = 0; i < ind_vert.size() / 6; ++i)
+	{
+		indices_.push_back(i);
+	}
 
 
 
@@ -593,7 +710,7 @@ int main()
 	unsigned int counter = 0;
 
 
-	bool draw_cut_mesh = false;
+	bool draw_cut_mesh = true;
 	bool draw_src_mesh = false;
 	bool draw_result = false;
 
@@ -640,19 +757,36 @@ int main()
 		//blank_shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(blank_shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(blank_shaderProgram, "camMatrix");
-		//VAO_blank.Bind();
 		//glDrawElements(GL_TRIANGLES, blank.get_indices().size(), GL_UNSIGNED_INT, 0);
 
 
 
-		tool_shaderProgram.Activate();
+		
 		//VAO_tool.Bind();
 		//glDrawElements(GL_TRIANGLES, tool.get_indices().size(), GL_UNSIGNED_INT, 0);
 
 		camera.Matrix(tool_shaderProgram, "camMatrix");
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		draw_model(tool.get_vertices(), tool.get_indices(), VBO_tool, VAO_tool, EBO_tool);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
+		//blank.set_vertices(s_vert);
+		//blank.set_indices(s_ind);
+
+
+		if (draw_cut_mesh)
+		{
+			
+			blank_shaderProgram.Activate();
+			VAO_blank.Bind();
+			draw_model(ind_vert, indices_, VBO_blank, VAO_blank, EBO_blank);
+		}
+
+		if (draw_src_mesh)
+		{
+			tool_shaderProgram.Activate();
+			VAO_tool.Bind();
+			draw_model(tool.get_vertices(), tool.get_indices(), VBO_tool, VAO_tool, EBO_tool);
+		}
 
 		
 		std::string x_cord = "X = " + std::to_string(blank.get_x());
@@ -662,9 +796,9 @@ int main()
 
 
 		ImGui::Begin("Tool info");
-		ImGui::Checkbox("Draw cut mesh", &draw_cut_mesh);
-		ImGui::Checkbox("Draw src mesh", &draw_src_mesh);
-		ImGui::Checkbox("Draw result mesh", &draw_result);
+		ImGui::Checkbox("Draw blank mesh", &draw_cut_mesh);
+		ImGui::Checkbox("Draw tool mesh", &draw_src_mesh);
+		//ImGui::Checkbox("Draw result mesh", &draw_result);
 		//ImGui::Text(x_cord.c_str());
 		//ImGui::Text(y_cord.c_str());
 		//ImGui::Text(z_cord.c_str());

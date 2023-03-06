@@ -14,10 +14,6 @@
 #include <igl/read_triangle_mesh.h>
 #include <igl/writeOBJ.h>
 
-#include <stdio.h> 
-#include <time.h> 
-
-
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
@@ -76,7 +72,6 @@ class Mesh {
 
 	std::vector<float> vertices_and_normals;
 	std::vector<float> vertices;
-	//std::vector<float> normals;
 	std::vector<int> indices;
 	std::vector<uint32_t> face_sizes;
 	std::vector<uint32_t> indices_u;
@@ -88,11 +83,8 @@ public:
 		y = 0;
 		z = 0;
 
-
 		vertices = vertices_input;
 		indices = indices_input;
-
-
 
 		for (int i = 0; i < indices.size(); i++)
 		{
@@ -103,12 +95,6 @@ public:
 		{
 			face_sizes.push_back((uint32_t)3);
 		}
-
-		//std::cout << "----------------------------------------------" << std::endl;
-		//std::cout << "Vertices count = " << get_vert_count() << std::endl;
-		//std::cout << "Indices count = " << get_ind_count() << std::endl;
-		//std::cout << "Face size count = " << get_face_sizes().size() << std::endl;
-		//std::cout << "----------------------------------------------" << std::endl;
 
 	}
 
@@ -161,106 +147,6 @@ public:
 	{
 
 		return face_sizes;
-	}
-
-
-	std::vector<float> calc_normals()
-	{
-		//normals.clear();
-
-		std::vector<float> normals;
-
-		float x1, y1, z1, x2, y2, z2, x3, y3, z3;
-
-		std::vector<float> P1, P2, N;
-
-		int V1, V2, V3;
-
-		std::vector<std::vector<float>> vert;
-
-		
-
-		std::vector<float> coords;
-		
-		std::vector<uint32_t> ind;
-
-
-		for (int i = 0; i < vertices.size(); i += 3)
-		{
-			coords.push_back(vertices[i]);
-			coords.push_back(vertices[i+1]);
-			coords.push_back(vertices[i+2]);
-			vert.push_back(coords);
-			coords.clear();
-		}
-
-
-
-		for (int i = 0; i < indices.size(); i += 3)
-		{
-			V1 = indices[i];
-			V2 = indices[i + 1];
-			V3 = indices[i + 2];
-			x1 = vert[V1][0];
-			y1 = vert[V1][1];
-			z1 = vert[V1][2];
-			x2 = vert[V2][0];
-			y2 = vert[V2][1];
-			z2 = vert[V2][2];
-			x3 = vert[V3][0];
-			y3 = vert[V3][1];
-			z3 = vert[V3][2];
-
-			P1.push_back(x1 - x2);
-			P1.push_back(y1 - y2);
-			P1.push_back(z1 - z2);
-
-			P2.push_back(x3 - x2);
-			P2.push_back(y3 - y2);
-			P2.push_back(z3 - z2);
-
-			N.push_back(P1[2] * P2[1] - P1[1] * P2[2]);
-			N.push_back(P1[0] * P2[2] - P1[2] * P2[0]);
-			N.push_back(P1[1] * P2[0] - P1[0] * P2[1]);
-
-			normals.push_back(x1);
-			normals.push_back(y1);
-			normals.push_back(z1);
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
-			normals.push_back(x2);
-			normals.push_back(y2);
-			normals.push_back(z2);
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
-			normals.push_back(x3);
-			normals.push_back(y3);
-			normals.push_back(z3);
-			normals.push_back(N[0]);
-			normals.push_back(N[1]);
-			normals.push_back(N[2]);
-
-			P1.clear();
-			P2.clear();
-			N.clear();
-
-
-		}
-
-		for (uint32_t i = 0; i < normals.size() / 6; ++i)
-		{
-			ind.push_back(i);
-		}
-
-		set_indices(ind);
-
-		return normals;
-
-		normals.clear();
-		vert.clear();
-		ind.clear();
 	}
 
 
@@ -348,7 +234,7 @@ void draw_model(std::vector<float> vertices, std::vector<int> indices, VBO VBO_,
 
 
 
-std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> vertices)
+std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> vertices_)
 {
 
 	std::vector<float> ind_and_vert;
@@ -361,16 +247,15 @@ std::vector<float> calc_norm(std::vector<uint32_t> indices, std::vector<float> v
 	float x1, y1, z1, x2, y2, z2, x3, y3, z3;
 
 
-	for (int i = 0; i < vertices.size(); i += 3)
+	for (int i = 0; i < vertices_.size(); i += 3)
 	{
-		vert_by_num.push_back( {vertices[i], vertices[i+1], vertices[i+2]} );
+		vert_by_num.push_back( { vertices_[i], vertices_[i+1], vertices_[i+2]} );
 	}
 
 
 
 	for (int i = 0; i < indices.size(); i += 3)
 	{
-		//
 		V1 = indices[i];
 		V2 = indices[i + 1];
 		V3 = indices[i + 2];
@@ -428,11 +313,6 @@ int main()
 	Mesh blank(Parse_vertices_blank(), Parse_indices_blank());
 	Mesh tool(Parse_vertices_tool(), Parse_indices_tool());
 
-
-
-
-
-
 	// load meshes.
 	// -----------------
 	InputMesh srcMesh;
@@ -482,13 +362,20 @@ int main()
 		std::exit(1);
 	}
 
+	std::vector<float> tool_vert;
+	std::vector<uint32_t> tool_ind;
+
+
 	// copy vertices
 	for (int i = 0; i < (int)cutMesh.V.size(); ++i) {
 		const std::vector<double>& v = cutMesh.V[i];
 		my_assert(v.size() == 3);
-		cutMesh.vertexCoordsArray.push_back(v[0]+0.5);
-		cutMesh.vertexCoordsArray.push_back(v[1]+0.5);
-		cutMesh.vertexCoordsArray.push_back(v[2]+0.5);
+		cutMesh.vertexCoordsArray.push_back(v[0]+0.7);
+		cutMesh.vertexCoordsArray.push_back(v[1]+0.7);
+		cutMesh.vertexCoordsArray.push_back(v[2]+0.7);
+		tool_vert.push_back(v[0]);
+		tool_vert.push_back(v[1]);
+		tool_vert.push_back(v[2]);
 	}
 
 	// copy faces
@@ -496,6 +383,7 @@ int main()
 		const std::vector<int>& f = cutMesh.F[i];
 		for (int j = 0; j < (int)f.size(); ++j) {
 			cutMesh.faceIndicesArray.push_back(f[j]);
+			tool_ind.push_back(f[j]);
 		}
 
 		cutMesh.faceSizesArray.push_back((uint32_t)f.size());
@@ -511,21 +399,13 @@ int main()
 	// -----------------------------
 
 
-
-	time_t start, end;
-
-	time(&start);
-
-
-
-
 	err = mcDispatch(
 		context,
 		MC_DISPATCH_VERTEX_ARRAY_DOUBLE | // vertices are in array of doubles
 		MC_DISPATCH_ENFORCE_GENERAL_POSITION | // perturb if necessary
 		MC_DISPATCH_FILTER_FRAGMENT_SEALING_INSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE, // filter flags which specify the type of output we want
 		// source mesh
-		reinterpret_cast<const void*>(srcMesh.vertexCoordsArray.data()),
+		(srcMesh.vertexCoordsArray.data()),
 		reinterpret_cast<const uint32_t*>(srcMesh.faceIndicesArray.data()),
 		srcMesh.faceSizesArray.data(),
 		static_cast<uint32_t>(srcMesh.vertexCoordsArray.size() / 3),
@@ -603,13 +483,20 @@ int main()
 	blank.set_indices(s_ind);
 	//tool.set_indices(ccFaceIndices);
 	tool.set_indices(ccFaceIndices);
-	/*
-	for (int i = 0; i < tool.get_indices().size(); i += 3)
-	{
-		std::cout << tool.get_indices()[i] << '\t' << tool.get_indices()[i + 1] << '\t' << tool.get_indices()[i + 2] << std::endl; 
-	}
-	std::cout << tool.get_vertices().size() << std::endl;
-	*/
+
+
+
+	err = mcReleaseConnectedComponents(context, 0, NULL);
+
+	my_assert(err == MC_NO_ERROR);
+
+	//  destroy context
+	// ------------------
+	err = mcReleaseContext(context);
+
+	my_assert(err == MC_NO_ERROR);
+
+
 
 
 	// Initialize GLFW
@@ -632,14 +519,16 @@ int main()
 
 
 
+	/*
+	std::vector<float> vert_tool = calc_norm(tool_ind, tool_vert);
 
-	std::vector<float> ind_vert = calc_norm(ccFaceIndices, vert_res);
-
-	std::vector<int> indices_;
-	for (int i = 0; i < ind_vert.size() / 6; ++i)
+	std::vector<int> indices_tool;
+	for (int i = 0; i < vert_tool.size() / 6; ++i)
 	{
-		indices_.push_back(i);
-	}
+		indices_tool.push_back(i);
+	}*/
+
+
 
 
 
@@ -698,7 +587,7 @@ int main()
 	unsigned int counter = 0;
 
 
-	bool draw_cut_mesh = true;
+	bool draw_cut_mesh = false;
 	bool draw_src_mesh = false;
 	bool draw_result = false;
 
@@ -711,6 +600,31 @@ int main()
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+
+	std::vector<float> draw_res_vert;
+	std::vector<int> draw_res_ind;
+	std::vector<double> sorce_vert;
+	std::vector<uint32_t> sorce_ind;
+	std::vector<uint32_t> sorce_face_sizes;
+
+	for (int i = 0; i < srcMesh.vertexCoordsArray.size(); i += 3)
+	{
+		sorce_vert.push_back((srcMesh.vertexCoordsArray[i]));
+		sorce_vert.push_back(srcMesh.vertexCoordsArray[i+1]);
+		sorce_vert.push_back(srcMesh.vertexCoordsArray[i+2]);
+	}
+
+	for (int i = 0; i < srcMesh.faceIndicesArray .size(); ++i)
+	{
+		sorce_ind.push_back((srcMesh.faceIndicesArray[i]));
+	}
+
+	for (int i = 0; i < srcMesh.faceSizesArray.size(); ++i)
+	{
+		sorce_face_sizes.push_back((srcMesh.faceSizesArray[i]));
+	}
+
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -749,17 +663,160 @@ int main()
 
 		if (draw_cut_mesh)
 		{
+
+			McContext context = MC_NULL_HANDLE;
+			McResult err = mcCreateContext(&context, MC_DEBUG);
+
+			my_assert(err == MC_NO_ERROR);
+
+
+			for (int i = 0; i < sorce_vert.size(); i += 3)
+			{
+				sorce_vert[i] += 0.01;
+			}
+
+
+			err = mcDispatch(
+				context,
+				MC_DISPATCH_VERTEX_ARRAY_DOUBLE | // vertices are in array of doubles
+				MC_DISPATCH_ENFORCE_GENERAL_POSITION | // perturb if necessary
+				MC_DISPATCH_FILTER_FRAGMENT_SEALING_INSIDE | MC_DISPATCH_FILTER_FRAGMENT_LOCATION_ABOVE, // filter flags which specify the type of output we want
+				// source mesh
+				(sorce_vert.data()),
+				reinterpret_cast<const uint32_t*>(sorce_ind.data()),
+				sorce_face_sizes.data(),
+				static_cast<uint32_t>(sorce_vert.size() / 3),
+				static_cast<uint32_t>(sorce_face_sizes.size()),
+				// cut mesh
+				reinterpret_cast<const void*>(cutMesh.vertexCoordsArray.data()),
+				cutMesh.faceIndicesArray.data(),
+				cutMesh.faceSizesArray.data(),
+				static_cast<uint32_t>(cutMesh.vertexCoordsArray.size() / 3),
+				static_cast<uint32_t>(cutMesh.faceSizesArray.size()));
+
+			my_assert(err == MC_NO_ERROR);
+
+			// query the number of available connected component
+			// --------------------------------------------------
+			uint32_t numConnComps;
+			err = mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_FRAGMENT, 0, NULL, &numConnComps);
+			my_assert(err == MC_NO_ERROR);
+
+			printf("connected components: %d\n", (int)numConnComps);
+
+			if (numConnComps == 0) {
+				fprintf(stdout, "no connected components found\n");
+				exit(0);
+			}
+
+			// my_assert(numConnComps == 1); // exactly 1 result (for this example)
+
+			std::vector<McConnectedComponent> connectedComponents(numConnComps, MC_NULL_HANDLE);
+			connectedComponents.resize(numConnComps);
+			err = mcGetConnectedComponents(context, MC_CONNECTED_COMPONENT_TYPE_FRAGMENT, (uint32_t)connectedComponents.size(), connectedComponents.data(), NULL);
+
+			my_assert(err == MC_NO_ERROR);
+
+			// query the data of each connected component from MCUT
+			// -------------------------------------------------------
+
+			McConnectedComponent connComp = connectedComponents[0];
+
+			// query the vertices
+			// ----------------------
+
+			uint64_t numBytes = 0;
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_DOUBLE, 0, NULL, &numBytes);
+			my_assert(err == MC_NO_ERROR);
+			uint32_t ccVertexCount = (uint32_t)(numBytes / (sizeof(double) * 3));
+			std::vector<double> res_vert((uint64_t)ccVertexCount * 3u, 0);
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_VERTEX_DOUBLE, numBytes, (void*)res_vert.data(), NULL);
+			my_assert(err == MC_NO_ERROR);
+
+
+			sorce_vert.clear();
+			sorce_vert = res_vert;
+
+			vert_res.clear();
+			for (int i = 0; i < res_vert.size(); ++i)
+			{
+				vert_res.push_back((float)res_vert[i] * 100);
+			}
+
+			// query the faces
+			// -------------------
+			numBytes = 0;
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, 0, NULL, &numBytes);
+			my_assert(err == MC_NO_ERROR);
+			std::vector<uint32_t> ccFaceIndices(numBytes / sizeof(uint32_t), 0);
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_TRIANGULATION, numBytes, ccFaceIndices.data(), NULL);
+			my_assert(err == MC_NO_ERROR);
+
+			sorce_ind.clear();
+			sorce_ind = ccFaceIndices;
+
+
+			//  query the face sizes
+			// ------------------------
+			numBytes = 0;
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_SIZE, 0, NULL, &numBytes);
+			my_assert(err == MC_NO_ERROR);
+			std::vector<uint32_t> faceSizes(numBytes / sizeof(uint32_t), 0);
+			err = mcGetConnectedComponentData(context, connComp, MC_CONNECTED_COMPONENT_DATA_FACE_SIZE, numBytes, faceSizes.data(), NULL);
+			my_assert(err == MC_NO_ERROR);
+
+			sorce_face_sizes.clear();
+			sorce_face_sizes = faceSizes;
+
+
+			err = mcReleaseConnectedComponents(context, 0, NULL);
+
+			my_assert(err == MC_NO_ERROR);
+
+			//  destroy context
+			// ------------------
+			err = mcReleaseContext(context);
+
+			my_assert(err == MC_NO_ERROR);
+
+
+
+
+
+
+
+			draw_res_vert.clear();
+			//
+
+
+			draw_res_ind.clear();
+			draw_res_vert = calc_norm(ccFaceIndices, vert_res);
+
 			
+			for (int i = 0; i < draw_res_vert.size() / 6; ++i)
+			{
+				draw_res_ind.push_back(i);
+			}
+
+
 			blank_shaderProgram.Activate();
 			VAO_blank.Bind();
-			draw_model(ind_vert, indices_, VBO_blank, VAO_blank, EBO_blank);
+			draw_model(draw_res_vert, draw_res_ind, VBO_blank, VAO_blank, EBO_blank);
 		}
 
 		if (draw_src_mesh)
 		{
+			std::vector<float> ind_vert = calc_norm(ccFaceIndices, vert_res);
+
+			std::vector<int> indices_;
+			for (int i = 0; i < ind_vert.size() / 6; ++i)
+			{
+				indices_.push_back(i);
+			}
+
 			tool_shaderProgram.Activate();
 			VAO_tool.Bind();
-			draw_model(tool.get_vertices(), tool.get_indices(), VBO_tool, VAO_tool, EBO_tool);
+			draw_model(ind_vert, indices_, VBO_tool, VAO_tool, EBO_tool);
 		}
 
 		
